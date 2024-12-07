@@ -13,7 +13,7 @@ package COMPRESSION is
 	procedure GetSymbols (textToCompress : in File_Type; symbolsHashTable : out hashMap);
    -- This procedure will go through the entire text file and add each character to the symbolsHashTable.
       -- If a character is already inside the hashtable then we need to update the number of occurences by 1.
-         procedure IsIn (symbol : in Character; symbolsHashTable : in hashMap);
+         procedure IsInTable (symbol : in Character; symbolsHashTable : in hashMap);
       -- Else we create the entry.
       -- In the end, we obtain a hash table with each used character and the number of occurences.
       -- The last character is always added and is the ending symbol, with an occurence of 0.
