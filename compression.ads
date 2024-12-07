@@ -11,7 +11,7 @@ package COMPRESSION is
 
    -- Store the sybols used in the text file.
 	procedure GetSymbols (textToCompress : in File_Type; symbolsHashTable : out hashMap) with
-         Pre => not End_Of_File(textToCompress);
+         Pre => not End_Of_File (textToCompress);
 
    -- This procedure will go through the entire text file and add each character to the symbolsHashTable.
       -- If a character is already inside the hashtable then we need to update the number of occurences by 1.
@@ -63,7 +63,7 @@ package COMPRESSION is
 	-- Create the file with the symbols, the tree structure and the encoded text.
 	procedure CreateFile (binaryTree : in tree; encodedSymbols : in hashMap; encodedFile : out File_Type) with
          Pre => encodedSymbols.size > 0;
-         Post => not End_Of_File(textToCompress);
+         Post => not End_Of_File (textToCompress);
 
    -- This procedure will create a new file that contains all of the symbols used, the tree structure and the encoded text.
       -- We first need to put in the file every symbols used, sorted by number of occurences.
