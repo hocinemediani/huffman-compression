@@ -1,2 +1,6 @@
 with COMPRESSION; use COMPRESSION;
 
+procedure COMPRESSION_TEST is
+begin
+
+end COMPRESSION_TEST;
