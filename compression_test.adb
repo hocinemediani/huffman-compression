@@ -9,6 +9,9 @@ procedure COMPRESSION_TEST is
    -- A handmade compressed version of the file.
    correctFile : File_Type;
 
+   symbolsTable : hashMap;
+   binaryTree : tree;
+
    -- Used to initialise a hash table with the characters present in the inputFile.
    arrayLength : CONSTANT Integer := 11;
    HashTable : hashMap;
@@ -37,6 +40,7 @@ procedure COMPRESSION_TEST is
 
    procedure TestBuildHuffmanTree is
    begin
+      BuildHuffmanTree (symbolsTable, binaryTree);
 
    end TestBuildHuffmanTree;
 
