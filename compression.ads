@@ -9,7 +9,7 @@ package COMPRESSION is
 
    type treeNodePointer is access treeNode;
 
-   type treeNodeArray is array (0 .. 256) of access tree;
+   type treeNodeArray is array (0 .. 256) of treeNodePointer;
 
    type tree is record
       root : treeNodePointer;
