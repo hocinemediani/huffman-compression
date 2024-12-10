@@ -1,8 +1,25 @@
 package TH is
 
-   type entryNode is private;
-   type hashMap is private;
-   type nodeArray is private;
+   type entryNode;
+
+   type entryNodePointer is access entryNode;
+
+   type nodeArray is array (0 .. 256) of entryNodePointer;
+
+   type entryNode is record
+      key : Character;
+      value : Integer;
+      -- Only used if two or more nodes have the same hashed key.
+      next : entryNodePointer;
+   end record;
+
+   type hashMap is record
+      -- The actual used size of the hash map.
+      size : Integer;
+      -- The total size of the hash map (used for hashing too).
+      length : Integer;
+      entryNodeArray : nodeArray;
+   end record;
 
 
    -- Initialize an empty hash map.
@@ -56,27 +73,5 @@ package TH is
    generic
 		with procedure Treat (Cle : in Character; Valeur: in Integer);
 	procedure ForAll (HashTable : in hashMap);
-
-
-private
-
-   type entryNodePointer is access entryNode;
-
-   type nodeArray is array (0 .. 256) of entryNodePointer;
-
-   type entryNode is record
-      key : Character;
-      value : Integer;
-      -- Only used if two or more nodes have the same hashed key.
-      next : entryNodePointer;
-   end record;
-
-   type hashMap is record
-      -- The actual used size of the hash map.
-      size : Integer;
-      -- The total size of the hash map (used for hashing too).
-      length : Integer;
-      entryNodeArray : nodeArray;
-   end record;
 
 end TH;

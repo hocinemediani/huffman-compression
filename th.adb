@@ -58,7 +58,7 @@ package body TH is
    procedure Register (HashTable : in out hashMap; Key : in Character; Value : in Integer) is
 
    current, previous, firstNode : entryNodePointer;
-   hashedKey : CONSTANT Integer;
+   hashedKey : CONSTANT Integer := Character'Pos (Key);
 
    begin
       current := HashTable.entryNodeArray (hashedKey);
@@ -88,7 +88,7 @@ package body TH is
    procedure Delete (HashTable : in out hashMap; Key : in Character) is
 
    previous, current : entryNodePointer;
-   hashedKey : CONSTANT Integer;
+   hashedKey : CONSTANT Integer := Character'Pos (Key);
 
    begin
       current := HashTable.entryNodeArray (hashedKey);
@@ -117,7 +117,7 @@ package body TH is
    function IsIn (HashTable : in hashMap; Key : in Character) return Boolean is
     
    current : entryNodePointer;
-   hashedKey : CONSTANT Integer;
+   hashedKey : CONSTANT Integer := Character'Pos (Key);
     
    begin
       current := HashTable.EntryNodeArray (hashedKey);
@@ -134,7 +134,7 @@ package body TH is
    function ValueOf (HashTable : in hashMap; Key : in Character) return Integer is
 
    current : entryNodePointer;
-   hashedKey : CONSTANT Integer;
+   hashedKey : CONSTANT Integer := Character'Pos (Key);
 
    begin
       current := HashTable.entryNodeArray (hashedKey);
@@ -150,7 +150,7 @@ package body TH is
 
    procedure Display (Key : in Character; Value : in Integer) is
    begin
-      Put("-->["); Put ('"'); Put (To_String (Key)); Put ('"'); Put (" : "); Put (Value, 1); Put("]");
+      Put("-->["); Put ('"'); Put (Key); Put ('"'); Put (" : "); Put (Value, 1); Put("]");
    end Display;
 
 

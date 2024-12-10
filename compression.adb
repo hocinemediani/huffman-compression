@@ -3,8 +3,21 @@ package body COMPRESSION is
    hashTableSize : CONSTANT Integer := 256;
 
    procedure GetSymbols (textToCompress : in File_type; symbolsHashTable : out hashMap) is
+
+   fileCharacter : Character;
+
    begin
       InitialiseHashTable (symbolsHashTable, hashTableSize);
+      Open (textToCompress, In_File, "input.txt");
+      while not End_Of_File (textToCompress) loop
+         Get (fileCharacter);
+         if IsIn (symbolsHashTable, fileCharacter) then
+            Register (symbolsHashTable, fileCharacter, 1);
+         else
+            Register (symbolsHashTable, fileCharacter, ValueOf (symbolsHashTable, fileCharacter) + 1);
+         end if;
+      end loop;
+      Close (textToCompress);
    end GetSymbols;
 
 

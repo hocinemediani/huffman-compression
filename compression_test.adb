@@ -17,7 +17,7 @@ procedure COMPRESSION_TEST is
    binaryTree : tree;
    symbolsTable : hashMap;
    encodedSymbols : hashMap;
-   encodedFile : File_Type
+   encodedFile : File_Type;
    
    -- Used to initialise a hash table with the characters present in the inputFile.
    arrayLength : CONSTANT Integer := 11;
