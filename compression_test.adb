@@ -29,10 +29,10 @@ procedure COMPRESSION_TEST is
 
    -- Used to initialise a hash table with the characters present in the inputFile.
    arrayLength : CONSTANT Integer := 11;
-   HashTable : hashMap;
 
-   Symbols : CONSTANT array (0 .. arrayLength) of Character
-      := ('o', 'm', 'n', 'a', 'p', 's', 't', 'b', '$', 'l', ' ', 'e');
+   Symbols : CONSTANT array (0 .. arrayLength) of characterByte
+      := (111, 109, 110, 97, 112, 115, 116, 98, 255, 108, 32, 101);
+      --  'o', 'm', 'n', 'a', 'p', 's', 't', 'b', '$', 'l', ' ', 'e'
    
    Occurences : CONSTANT array (0 .. arrayLength) of Integer
       := (2, 2, 2, 1, 1, 1, 1, 1, 0, 1, 3, 3);
@@ -70,7 +70,7 @@ procedure COMPRESSION_TEST is
       GetTextCode (binaryTree, symbolsTable, encodedSymbols);
 
       for j in 0 .. arrayLength loop
-        pragma Assert (ValueOf (encodedSymbols, Symbols(j)) = To_String (HuffmanCode(j))); 
+        pragma Assert (ValueOf (encodedSymbols, Symbols(j)) = Integer'Value (To_String (HuffmanCode(j)))); 
       end loop;
    end TestGetTextCode;
 

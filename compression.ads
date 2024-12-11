@@ -19,8 +19,8 @@ package COMPRESSION is
 	type treeNode is record
 		symbol : Character;
 		occurrences : Integer;
-		rightChild : tree;
-		leftChild : tree;
+		rightChild : treeNodePointer;
+		leftChild : treeNodePointer;
 	end record;
 
    -- Store the sybols used in the text file.
@@ -29,8 +29,6 @@ package COMPRESSION is
 
    -- This procedure will go through the entire text file and add each character to the symbolsHashTable.
       -- If a character is already inside the hashtable then we need to update the number of occurences by 1.
-         procedure IsInTable (symbol : in Character; symbolsHashTable : in hashMap) with 
-               Pre => symbolsHashTable.size > 0;
       -- Else we create the entry.
       -- In the end, we obtain a hash table with each used character and the number of occurences.
       -- The last character is always added and is the ending symbol, with an occurence of 0.
@@ -58,7 +56,7 @@ package COMPRESSION is
 
          -- And we call BuildHuffmanTree again, with the fullHashTable as the first argument.
          -- The iterations stop when we only have one entry in the hash table, with a nul character.
-         -- We also need to update the tree structure each time we create a new node (some ndoes will point to another, some will be pointed to)
+         -- We also need to update the tree structure each time we create a new node (some nodes will point to another, some will be pointed to).
          procedure UpdateTree (treeArray : in treeNodeArray; binaryTree : out tree) with
                Post => binaryTree.root /= Null;
         

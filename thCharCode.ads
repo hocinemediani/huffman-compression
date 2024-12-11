@@ -1,79 +1,79 @@
 with Ada.Strings.Unbounded;   use Ada.Strings.Unbounded;
 
-package TH is
+package THCharCode is
 
-   type entryNode;
+   type entryNode2;
 
-   type entryNodePointer is access entryNode;
+   type entryNodePointer2 is access entryNode2;
 
-   type nodeArray is array (0 .. 256) of entryNodePointer;
+   type nodeArray2 is array (0 .. 256) of entryNodePointer2;
 
-   type entryNode is record
+   type entryNode2 is record
       key : Character;
       value : Integer;
       -- Only used if two or more nodes have the same hashed key.
-      next : entryNodePointer;
+      next : entryNodePointer2;
    end record;
 
-   type hashMap is record
+   type hashMap2 is record
       -- The actual used size of the hash map.
       size : Integer;
       -- The total size of the hash map (used for hashing too).
       length : Integer;
-      entryNodeArray : nodeArray;
+      entryNodeArray : nodeArray2;
    end record;
 
 
    -- Initialize an empty hash map.
-   procedure InitialiseHashTable (HashTable : in out hashMap; Length : in Integer) with
-      Post => IsEmpty (HashTable);
+   procedure InitialiseHashTable2 (HashTable : in out hashMap; Length : in Integer) with
+      Post => IsEmpty2 (HashTable);
 
 
    -- Destroy the hash map.
-   procedure DestroyHashTable (HashTable : in out hashMap);
+   procedure DestroyHashTable2 (HashTable : in out hashMap);
 
 
    -- Check if a hash map is empty.
-   function IsEmpty (HashTable : in hashMap) return Boolean;
+   function IsEmpty2 (HashTable : in hashMap) return Boolean;
 
 
    -- Get the number of elements in a hash map.
-   function GetSize (HashTable : in hashMap) return Integer with
-      Post => GetSize'Result >= 0
-         and (GetSize'Result = 0) = IsEmpty (HashTable);
+   function GetSize2 (HashTable : in hashMap) return Integer with
+      Post => GetSize2'Result >= 0
+         and (GetSize2'Result = 0) = IsEmpty2 (HashTable);
 
 
    -- Registers a new value associated to a key or update it.
-   procedure Register (HashTable : in out hashMap; Key : in Character; Value : in Integer) with
-      Post => IsIn(HashTable, Key) and (ValueOf (HashTable, Key) = Value)
-         and (not (IsIn (HashTable, Key)'Old) or GetSize (HashTable) = GetSize (HashTable)'Old)
-         and (IsIn (HashTable, Key)'Old or GetSize (HashTable) = GetSize (HashTable)'Old + 1);
+   procedure Register2 (HashTable : in out hashMap; Key : in Character; Value : in Integer) with
+      Post => IsIn2 (HashTable, Key) and (ValueOf2 (HashTable, Key) = Value)
+         and (not (IsIn2 (HashTable, Key)'Old) or GetSize2 (HashTable) = GetSize2 (HashTable)'Old)
+         and (IsIn2 (HashTable, Key)'Old or GetSize2 (HashTable) = GetSize2 (HashTable)'Old + 1);
 
 
    -- Deletes a node in the hash map with the exception Cle_Absente_Exception.
-   procedure Delete (HashTable : in out hashMap; Key : in Character) with
-      Post => GetSize (HashTable) = GetSize (HashTable)'Old - 1
-         and not IsIn (HashTable, Key);
+   procedure Delete2 (HashTable : in out hashMap; Key : in Character) with
+      Post => GetSize2 (HashTable) = GetSize2 (HashTable)'Old - 1
+         and not IsIn2 (HashTable, Key);
 
 
    -- Check if a key is in the hash map.
-   function IsIn (HashTable : in hashMap; Key : in Character) return Boolean;
+   function IsIn2 (HashTable : in hashMap; Key : in Character) return Boolean;
 
 
    -- Get the value associated to a key with the exception Cle_Absente_Exception.
-   function ValueOf (HashTable : in hashMap; Key : in Character) return Integer;
+   function ValueOf2 (HashTable : in hashMap; Key : in Character) return Integer;
 
 
    -- Display a node.
-   procedure Display (Key : in Character; Value : in Integer);
+   procedure Display2 (Key : in Character; Value : in Integer);
 
 
    -- Display the hash map.
-   procedure DisplayHashTable (HashTable : in hashMap);
+   procedure DisplayHashTable2 (HashTable : in hashMap);
 
    -- Apply a treatment to all of the hash table.
    generic
-		with procedure Treat (Cle : in Character; Valeur: in Integer);
-	procedure ForAll (HashTable : in hashMap);
+		with procedure Treat2 (Cle : in Character; Valeur: in Integer);
+	procedure ForAll2 (HashTable : in hashMap);
 
-end TH;
+end THCharCode;

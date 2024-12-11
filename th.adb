@@ -55,10 +55,16 @@ package body TH is
    end GetSize;
 
 
-   procedure Register (HashTable : in out hashMap; Key : in Character; Value : in Integer) is
+   function Hash (Key : in characterByte) return Integer is
+   begin
+      return Integer (Key);
+   end Hash;
+
+
+   procedure Register (HashTable : in out hashMap; Key : in characterByte; Value : in Integer) is
 
    current, previous, firstNode : entryNodePointer;
-   hashedKey : CONSTANT Integer := Character'Pos (Key);
+   hashedKey : CONSTANT Integer := Hash (Key);
 
    begin
       current := HashTable.entryNodeArray (hashedKey);
@@ -85,10 +91,10 @@ package body TH is
    end Register;
 
 
-   procedure Delete (HashTable : in out hashMap; Key : in Character) is
+   procedure Delete (HashTable : in out hashMap; Key : in characterByte) is
 
    previous, current : entryNodePointer;
-   hashedKey : CONSTANT Integer := Character'Pos (Key);
+   hashedKey : CONSTANT Integer := Hash (Key);
 
    begin
       current := HashTable.entryNodeArray (hashedKey);
@@ -114,10 +120,10 @@ package body TH is
    end Delete;
 
 
-   function IsIn (HashTable : in hashMap; Key : in Character) return Boolean is
+   function IsIn (HashTable : in hashMap; Key : in characterByte) return Boolean is
     
    current : entryNodePointer;
-   hashedKey : CONSTANT Integer := Character'Pos (Key);
+   hashedKey : CONSTANT Integer := Hash (Key);
     
    begin
       current := HashTable.EntryNodeArray (hashedKey);
@@ -131,10 +137,10 @@ package body TH is
    end IsIn;
 
 
-   function ValueOf (HashTable : in hashMap; Key : in Character) return Integer is
+   function ValueOf (HashTable : in hashMap; Key : in characterByte) return Integer is
 
    current : entryNodePointer;
-   hashedKey : CONSTANT Integer := Character'Pos (Key);
+   hashedKey : CONSTANT Integer := Hash (Key);
 
    begin
       current := HashTable.entryNodeArray (hashedKey);
@@ -148,9 +154,9 @@ package body TH is
    end ValueOf;
 
 
-   procedure Display (Key : in Character; Value : in Integer) is
+   procedure Display (Key : in characterByte; Value : in Integer) is
    begin
-      Put("-->["); Put ('"'); Put (Key); Put ('"'); Put (" : "); Put (Value, 1); Put("]");
+      Put("-->["); Put ('"'); Put (Integer (Key), 1); Put ('"'); Put (" : "); Put (Value, 1); Put("]");
    end Display;
 
 

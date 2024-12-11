@@ -4,7 +4,7 @@ package body COMPRESSION is
 
    procedure GetSymbols (textToCompress : in File_type; symbolsHashTable : out hashMap) is
 
-   fileCharacter : Character;
+   fileCharacter : characterByte;
 
    begin
       InitialiseHashTable (symbolsHashTable, hashTableSize);

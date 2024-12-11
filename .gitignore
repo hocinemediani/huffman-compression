@@ -2,3 +2,5 @@ sda_exceptions.o
 sda_exceptions.ali
 th.ali
 th.o
+compression_test.o
+compression_test.ali

@@ -1,5 +1,7 @@
 package TH is
 
+   type characterByte is mod 2**8;
+
    type entryNode;
 
    type entryNodePointer is access entryNode;
@@ -7,7 +9,7 @@ package TH is
    type nodeArray is array (0 .. 256) of entryNodePointer;
 
    type entryNode is record
-      key : Character;
+      key : characterByte;
       value : Integer;
       -- Only used if two or more nodes have the same hashed key.
       next : entryNodePointer;
@@ -41,29 +43,33 @@ package TH is
          and (GetSize'Result = 0) = IsEmpty (HashTable);
 
 
+   -- Hash a key.
+   function Hash (Key : in characterByte) return Integer;
+
+
    -- Registers a new value associated to a key or update it.
-   procedure Register (HashTable : in out hashMap; Key : in Character; Value : in Integer) with
+   procedure Register (HashTable : in out hashMap; Key : in characterByte; Value : in Integer) with
       Post => IsIn(HashTable, Key) and (ValueOf (HashTable, Key) = Value)
          and (not (IsIn (HashTable, Key)'Old) or GetSize (HashTable) = GetSize (HashTable)'Old)
          and (IsIn (HashTable, Key)'Old or GetSize (HashTable) = GetSize (HashTable)'Old + 1);
 
 
    -- Deletes a node in the hash map with the exception Cle_Absente_Exception.
-   procedure Delete (HashTable : in out hashMap; Key : in Character) with
+   procedure Delete (HashTable : in out hashMap; Key : in characterByte) with
       Post => GetSize (HashTable) = GetSize (HashTable)'Old - 1
          and not IsIn (HashTable, Key);
 
 
    -- Check if a key is in the hash map.
-   function IsIn (HashTable : in hashMap; Key : in Character) return Boolean;
+   function IsIn (HashTable : in hashMap; Key : in characterByte) return Boolean;
 
 
    -- Get the value associated to a key with the exception Cle_Absente_Exception.
-   function ValueOf (HashTable : in hashMap; Key : in Character) return Integer;
+   function ValueOf (HashTable : in hashMap; Key : in characterByte) return Integer;
 
 
    -- Display a node.
-   procedure Display (Key : in Character; Value : in Integer);
+   procedure Display (Key : in characterByte; Value : in Integer);
 
 
    -- Display the hash map.
@@ -71,7 +77,7 @@ package TH is
 
    -- Apply a treatment to all of the hash table.
    generic
-		with procedure Treat (Cle : in Character; Valeur: in Integer);
+		with procedure Treat (Cle : in characterByte; Valeur: in Integer);
 	procedure ForAll (HashTable : in hashMap);
 
 end TH;

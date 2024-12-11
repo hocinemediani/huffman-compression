@@ -3,25 +3,25 @@ with Ada.Integer_Text_IO;    use Ada.Integer_Text_IO;
 with SDA_Exceptions;         use SDA_Exceptions;
 with Ada.Unchecked_Deallocation;
 
-package body TH is
+package body THCharCode is
 
    procedure Free is
-      new Ada.Unchecked_Deallocation (Object => entryNode, Name => entryNodePointer);
+      new Ada.Unchecked_Deallocation (Object => entryNode2, Name => entryNodePointer2);
 
 
-   procedure InitialiseHashTable (HashTable : in out hashMap; Length : in Integer) is
+   procedure InitialiseHashTable2 (HashTable : in out hashMap2; Length : in Integer) is
    begin
       HashTable.size := 0;
       HashTable.length := Length;
       for i in 0 .. (HashTable.length - 1) loop
          HashTable.entryNodeArray (i) := null;
       end loop;
-   end InitialiseHashTable;
+   end InitialiseHashTable2;
 
 
-   procedure DestroyHashTable (HashTable : in out hashMap) is
+   procedure DestroyHashTable2 (HashTable : in out hashMap2) is
 
-   previous, current : entryNodePointer;
+   previous, current : entryNodePointer2;
 
    begin
       -- Exploring the nodes.
@@ -39,25 +39,25 @@ package body TH is
          HashTable.entryNodeArray (i) := null;
       end loop;
       HashTable.size := 0;
-    end DestroyHashTable;
+    end DestroyHashTable2;
 
 
-   function IsEmpty (HashTable : in hashMap) return Boolean is
+   function IsEmpty2 (HashTable : in hashMap2) return Boolean is
    begin
       -- Size is the actual numbers of entry in the hash map.
       return HashTable.size = 0;
    end IsEmpty;
 
 
-   function GetSize (HashTable : in hashMap) return Integer is
+   function GetSize2 (HashTable : in hashMap2) return Integer is
    begin
       return HashTable.size;
-   end GetSize;
+   end GetSize2;
 
 
-   procedure Register (HashTable : in out hashMap; Key : in Character; Value : in Integer) is
+   procedure Register2 (HashTable : in out hashMap2; Key : in Character; Value : in Integer) is
 
-   current, previous, firstNode : entryNodePointer;
+   current, previous, firstNode : entryNodePointer2;
    hashedKey : CONSTANT Integer := Character'Pos (Key);
 
    begin
@@ -72,7 +72,7 @@ package body TH is
          current := current.next;
       end loop;
       declare
-         newNode : CONSTANT entryNodePointer := new entryNode' (key => Key, value => Value, next => null);
+         newNode : CONSTANT entryNodePointer2 := new entryNode2' (key => Key, value => Value, next => null);
       begin
          if current = firstNode then
             HashTable.entryNodeArray (hashedKey) := newNode;
@@ -82,12 +82,12 @@ package body TH is
          previous.next := newNode;
          HashTable.size := HashTable.size + 1;
       end;
-   end Register;
+   end Register2;
 
 
-   procedure Delete (HashTable : in out hashMap; Key : in Character) is
+   procedure Delete2 (HashTable : in out hashMap2; Key : in Character) is
 
-   previous, current : entryNodePointer;
+   previous, current : entryNodePointer2;
    hashedKey : CONSTANT Integer := Character'Pos (Key);
 
    begin
@@ -111,16 +111,16 @@ package body TH is
          previous := current;
          current := current.next;
       end loop;
-   end Delete;
+   end Delete2;
 
 
-   function IsIn (HashTable : in hashMap; Key : in Character) return Boolean is
+   function IsIn2 (HashTable : in hashMap2; Key : in Character) return Boolean is
     
-   current : entryNodePointer;
+   current : entryNodePointer2;
    hashedKey : CONSTANT Integer := Character'Pos (Key);
     
    begin
-      current := HashTable.EntryNodeArray (hashedKey);
+      current := HashTable.entryNodeArray (hashedKey);
       while current /= null loop
          if current.key = Key then
             return True;
@@ -128,12 +128,12 @@ package body TH is
          current := current.next;
       end loop;
       return False;
-   end IsIn;
+   end IsIn2;
 
 
-   function ValueOf (HashTable : in hashMap; Key : in Character) return Integer is
+   function ValueOf2 (HashTable : in hashMap2; Key : in Character) return Integer is
 
-   current : entryNodePointer;
+   current : entryNodePointer2;
    hashedKey : CONSTANT Integer := Character'Pos (Key);
 
    begin
@@ -145,52 +145,52 @@ package body TH is
          current := current.next;
       end loop;
       raise Cle_Absente_Exception;
-   end ValueOf;
+   end ValueOf2;
 
 
-   procedure Display (Key : in Character; Value : in Integer) is
+   procedure Display2 (Key : in Character; Value : in Integer) is
    begin
       Put("-->["); Put ('"'); Put (Key); Put ('"'); Put (" : "); Put (Value, 1); Put("]");
-   end Display;
+   end Display2;
 
 
-   procedure DisplayHashTable (HashTable : in hashMap) is
+   procedure DisplayHashTable2 (HashTable : in hashMap2) is
 
-   current : entryNodePointer;
+   current : entryNodePointer2;
         
    begin
       for i in 0 .. (HashTable.length - 1) loop
          current := HashTable.entryNodeArray (i);
          Put (i, 1); Put (" : ");
          if current /= null then
-            Display (HashTable.entryNodeArray (i).key, HashTable.entryNodeArray (i).value);
+            Display2 (HashTable.entryNodeArray (i).key, HashTable.entryNodeArray (i).value);
             while current.next /= null loop
-               Display (current.next.key, current.next.value);
+               Display2 (current.next.key, current.next.value);
                current := current.next;
             end loop;
          end if;
          Put_Line("--E");
       end loop;
       New_Line;
-   end DisplayHashTable;
+   end DisplayHashTable2;
 
 
-   procedure ForAll (HashTable : in hashMap) is
+   procedure ForAll2 (HashTable : in hashMap2) is
 
-   current : entryNodePointer;
+   current : entryNodePointer2;
 
    begin
       for i in 0 .. (HashTable.length - 1) loop
          current := HashTable.entryNodeArray (i);
          while current /= null loop
             begin
-               Treat (current.key, current.value);
+               Treat2 (current.key, current.value);
                exception
                   when others => null;
             end;
             current := current.next;
          end loop;
       end loop;
-   end ForAll;
+   end ForAll2;
 
-end TH;
+end THCharCode;
