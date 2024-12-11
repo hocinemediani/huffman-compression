@@ -29,8 +29,6 @@ package COMPRESSION is
 
    -- This procedure will go through the entire text file and add each character to the symbolsHashTable.
       -- If a character is already inside the hashtable then we need to update the number of occurences by 1.
-         procedure IsInTable (symbol : in Character; symbolsHashTable : in hashMap) with 
-               Pre => symbolsHashTable.size > 0;
       -- Else we create the entry.
       -- In the end, we obtain a hash table with each used character and the number of occurences.
       -- The last character is always added and is the ending symbol, with an occurence of 0.
