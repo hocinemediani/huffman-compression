@@ -24,7 +24,7 @@ package COMPRESSION is
 	end record;
 
    -- Store the sybols used in the text file.
-	procedure GetSymbols (textToCompress : in File_Type; symbolsHashTable : out hashMap) with
+	procedure GetSymbols (textToCompress : in out File_Type; symbolsHashTable : out hashMap) with
          Pre => not End_Of_File (textToCompress);
 
    -- This procedure will go through the entire text file and add each character to the symbolsHashTable.
