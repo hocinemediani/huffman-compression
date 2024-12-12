@@ -2,6 +2,7 @@ with Ada.Text_IO;             use Ada.Text_IO;
 with COMPRESSION;             use COMPRESSION;
 with Ada.Strings.Unbounded;   use Ada.Strings.Unbounded;
 with TH;                      use TH;
+with THCharCode;              use THCharCode;
 
 procedure COMPRESSION_TEST is
 
@@ -16,10 +17,10 @@ procedure COMPRESSION_TEST is
    -- The file compressed.
    outputFile : File_Type;
 
-   binaryTree : tree;
+   binaryTree : treeNodePointer;
    infixTree : Unbounded_String;
    symbolsTable : hashMap;
-   encodedSymbols : hashMap;
+   encodedSymbols : hashMap2;
    encodedFile : File_Type;
    
 
@@ -28,17 +29,17 @@ procedure COMPRESSION_TEST is
 
 
    -- Used to initialise a hash table with the characters present in the inputFile.
-   arrayLength : CONSTANT Integer := 11;
+   arrayLength : CONSTANT Integer := 12;
 
-   Symbols : CONSTANT array (0 .. arrayLength) of String (0 .. 7)
+   Symbols : CONSTANT array (1 .. arrayLength) of String (1 .. 8)
       := ("01101111", "01101101", "01101110", "01100001", "01110000", "01110011", "01110100", "01100010", "11111111", "01101100", "00100000", "01100101");
       --  111, 109, 110, 97,  112, 115, 116, 98,  255, 108, 32,  101
       --  'o', 'm', 'n', 'a', 'p', 's', 't', 'b', '$', 'l', ' ', 'e'
    
-   Occurences : CONSTANT array (0 .. arrayLength) of Integer
+   Occurences : CONSTANT array (1 .. arrayLength) of Integer
       := (2, 2, 2, 1, 1, 1, 1, 1, 0, 1, 3, 3);
 
-   HuffmanCode : CONSTANT array (0 .. arrayLength) of Unbounded_String
+   HuffmanCode : CONSTANT array (1 .. arrayLength) of Unbounded_String
       := (+"000", +"001", +"010", +"0110", +"0111", +"1000", +"1001", +"1010", +"10110", +"10111", +"110", +"111"); 
    
    InfixHuffmanTree : CONSTANT Unbounded_String := (+"00011010110001101011011");
@@ -59,26 +60,29 @@ procedure COMPRESSION_TEST is
 
 
    procedure TestBuildHuffmanTree is
+   
+   it : Integer := 0;
+   
    begin
       PutSymbols (encodedSymbols, encodedFile);
-      InfixBrowsing (binaryTree, encodedFile, infixTree);
+      InfixBrowsing (symbolsTable, binaryTree, infixTree, it);
       pragma Assert (infixTree = InfixHuffmanTree);
    end TestBuildHuffmanTree;
 
 
    procedure TestGetTextCode is
    begin
-      GetTextCode (binaryTree, symbolsTable, encodedSymbols);
+      GetTextCode (binaryTree, encodedSymbols);
 
       for j in 0 .. arrayLength loop
-        pragma Assert (ValueOf (encodedSymbols, Symbols(j)) = Integer'Value (To_String (HuffmanCode(j)))); 
+        pragma Assert (ValueOf2 (encodedSymbols, To_Unbounded_String (Symbols(j))) = To_String (HuffmanCode(j))); 
       end loop;
    end TestGetTextCode;
 
 
    procedure TestCreateFile is
    begin
-      CreateFile (binaryTree, encodedSymbols, outputFile);
+      CreateFile (symbolsTable, binaryTree, encodedSymbols, outputFile);
       Open (correctFile, In_File, "correct.txt");
       Open (outputFile, In_File, "outputFile.txt");
       while not End_Of_File (correctFile) and not End_Of_File (outputFile) loop

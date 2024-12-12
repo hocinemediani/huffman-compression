@@ -46,7 +46,7 @@ package body THCharCode is
    begin
       -- Size is the actual numbers of entry in the hash map.
       return HashTable.size = 0;
-   end IsEmpty;
+   end IsEmpty2;
 
 
    function GetSize2 (HashTable : in hashMap2) return Integer is
@@ -67,13 +67,13 @@ package body THCharCode is
       end loop;
 
       return result;
-   end Hash;
+   end Hash2;
 
 
-   procedure Register2 (HashTable : in out hashMap2; Key : in String; Value : in String) is
+   procedure Register2 (HashTable : in out hashMap2; Key : in Unbounded_String; Value : in Unbounded_String) is
 
    current, previous, firstNode : entryNodePointer2;
-   hashedKey : CONSTANT Integer := Character'Pos (Key);
+   hashedKey : CONSTANT Integer := Hash2 (To_String (Key));
 
    begin
       current := HashTable.entryNodeArray (hashedKey);
@@ -100,10 +100,10 @@ package body THCharCode is
    end Register2;
 
 
-   procedure Delete2 (HashTable : in out hashMap2; Key : in String) is
+   procedure Delete2 (HashTable : in out hashMap2; Key : in Unbounded_String) is
 
    previous, current : entryNodePointer2;
-   hashedKey : CONSTANT Integer := Character'Pos (Key);
+   hashedKey : CONSTANT Integer := Hash2 (To_String (Key));
 
    begin
       current := HashTable.entryNodeArray (hashedKey);
@@ -129,10 +129,10 @@ package body THCharCode is
    end Delete2;
 
 
-   function IsIn2 (HashTable : in hashMap2; Key : in String) return Boolean is
+   function IsIn2 (HashTable : in hashMap2; Key : in Unbounded_String) return Boolean is
     
    current : entryNodePointer2;
-   hashedKey : CONSTANT Integer := Character'Pos (Key);
+   hashedKey : CONSTANT Integer := Hash2 (To_String (Key));
     
    begin
       current := HashTable.entryNodeArray (hashedKey);
@@ -146,10 +146,10 @@ package body THCharCode is
    end IsIn2;
 
 
-   function ValueOf2 (HashTable : in hashMap2; Key : in String) return String is
+   function ValueOf2 (HashTable : in hashMap2; Key : in Unbounded_String) return Unbounded_String is
 
    current : entryNodePointer2;
-   hashedKey : CONSTANT Integer := Character'Pos (Key);
+   hashedKey : CONSTANT Integer := Hash2 (To_String (Key));
 
    begin
       current := HashTable.entryNodeArray (hashedKey);
@@ -163,9 +163,9 @@ package body THCharCode is
    end ValueOf2;
 
 
-   procedure Display2 (Key : in String; Value : in String) is
+   procedure Display2 (Key : in Unbounded_String; Value : in Unbounded_String) is
    begin
-      Put("-->["); Put ('"'); Put (Key); Put ('"'); Put (" : "); Put (Value); Put("]");
+      Put("-->["); Put ('"'); Put (To_String (Key)); Put ('"'); Put (" : "); Put (To_String (Value)); Put("]");
    end Display2;
 
 

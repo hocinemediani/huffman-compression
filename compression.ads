@@ -56,28 +56,28 @@ package COMPRESSION is
          -- We also need to update the tree structure each time we create a new node (some nodes will point to another, some will be pointed to).
         
    -- Store the encoding of each symbols in a new hash table.
-	procedure GetTextCode (binaryTree : in treeNodePointer; symbolsHashTable : in hashMap; encodedSymbols : out hashMap2) with
-         Pre => symbolsHashTable.size > 0,
-         Post => encodedSymbols.size = symbolsHashTable.size;
+	procedure GetTextCode (binaryTree : in treeNodePointer; encodedSymbols : out hashMap2);
+
+   function GetRoot (symbolsHashTable : in hashMap; binaryTree : out treeNodePointer) return treeNodePointer;
 
    -- This procedure will encode each character by exploring the Huffman tree we created.
       -- So we need to explore the Tree until we have maped each character to a code.
-      procedure ExploreTree (binaryTree : in out treeNodePointer; code : out Unbounded_String; encodedSymbols : in out hashMap2);
+      procedure ExploreTree (binaryTree : in treeNodePointer; code : in out Unbounded_String; encodedSymbols : in out hashMap2);
       -- And create a final hash table that will store the characters and their code.
 
 
 	-- Create the file with the symbols, the tree structure and the encoded text.
-	procedure CreateFile (binaryTree : in treeNodePointer; encodedSymbols : in hashMap; encodedFile : out File_Type) with
+	procedure CreateFile (symbolsHashTable : in hashMap; binaryTree : in treeNodePointer; encodedSymbols : in hashMap2; encodedFile : out File_Type) with
          Pre => encodedSymbols.size > 0,
          Post => not End_Of_File (encodedFile);
 
    -- This procedure will create a new file that contains all of the symbols used, the tree structure and the encoded text.
       -- We first need to put in the file every symbols used, sorted by number of occurences.
-      procedure PutSymbols (encodedSymbols : in hashMap; encodedFile : out File_Type);
+      procedure PutSymbols (encodedSymbols : in hashMap2; encodedFile : in out File_Type);
       -- Then we need to find the tree structure by infixed browsing of the tree and put it next to the characters used.
-      procedure InfixBrowsing (binaryTree : in treeNodePointer; encodedFile : in out File_Type; infixTree : out Unbounded_String);
+      procedure InfixBrowsing (symbolsHashTable : in hashMap; binaryTree : in treeNodePointer; infixTree : out Unbounded_String; it : in out Integer);
       -- And finally we need to encode the text.
       -- For that, we iterate through the characters in the raw text file and we store the encoded version of it.
-      procedure EncodeText (encodedFile : in out File_Type; encodedSymbols : in hashMap);
+      procedure EncodeText (inputFile : in File_Type; encodedFile : in out File_Type; encodedSymbols : in hashMap2);
 
 end COMPRESSION;
