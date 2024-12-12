@@ -2,6 +2,8 @@ package body COMPRESSION is
 
    hashTableSize : CONSTANT Integer := 128;
 
+
+-- Beginning of GetSymbols.
    procedure GetSymbols (textToCompress : in out File_type; symbolsHashTable : out hashMap) is
 
    fileCharacter : String (1 .. 1);
@@ -27,7 +29,7 @@ package body COMPRESSION is
    end GetSymbols;
 
 
--- Beginning of BuildHuffmanTree
+-- Beginning of BuildHuffmanTree.
    procedure SortArray (storageTree : in out treeQueue) is
    
    intermediateValue : Integer;
@@ -60,7 +62,6 @@ package body COMPRESSION is
    end CreateNode;
 
 
-
    procedure BuildHuffmanTree (symbolsHashTable : in hashMap; binaryTree : out treeNodePointer) is
    
    capacity : CONSTANT Integer := symbolsHashTable.size;
@@ -83,46 +84,95 @@ package body COMPRESSION is
    end BuildHuffmanTree;
 
 
--- Beginning of GetTextCode
-   procedure GetTextCode (binaryTree : in tree; symbolsHashTable : in hashMap; encodedSymbols : out hashMap) is
-   begin
-      Null;
-   end GetTextCode;
 
+-- Beginning of GetTextCode.
+   procedure ExploreTree (binaryTree : in out treeNodePointer; code : out Unbounded_String; encodedSymbols : in out hashMap2) is
 
-   procedure ExploreTree (binaryTree : in tree; symbol : out Character; code : out String) is
+   leftCode, rightCode : Unbounded_String;
+   hashedKey : Integer;
+
    begin
-      Null;
+      if binaryTree.leftChild = null then
+         hashedKey := Hash2 (binaryTree.All.symbol);
+         Register2 (encodedSymbols, binaryTree.All.symbol, To_String (code));
+      else
+         leftCode := code & "0";
+         ExploreTree (binaryTree.leftChild, leftCode, encodedSymbols);
+         rightCode := code & "1";
+         ExploreTree (binaryTree.rightChild, rightCode, encodedSymbols);
+      end if;
    end ExploreTree;
 
 
-   procedure UpdateEncodedHashTable (symbol : in Character; code : in String; encodedSymbols : out hashMap) is
+   procedure GetTextCode (binaryTree : in treeNodePointer; symbolsHashTable : in hashMap; encodedSymbols : out hashMap2) is
+   
+   code : Unbounded_String;
+   
    begin
-      Null;
-   end UpdateEncodedHashTable;
+      InitialiseHashTable2 (encodedSymbols, hashTableSize);
+      ExploreTree (binaryTree, code, encodedSymbols);
+   end GetTextCode;
 
 
-   procedure CreateFile (binaryTree : in tree; encodedSymbols : in hashMap; encodedFile : out File_Type) is
+
+-- Beginning of CreateFile.
+   procedure PutSymbols (encodedSymbols : in hashMap2; encodedFile : in out File_Type) is
    begin
-      Null;
-   end CreateFile;
-
-
-   procedure PutSymbols (encodedSymbols : in hashMap; encodedFile : out File_Type) is
-   begin
-      Null;
+      for i in 1 .. encodedSymbols.length loop
+         if encodedSymbols.entryNodeArray (i) /= null then
+            Put (encodedFile, "'"); Put (encodedFile, encodedSymbols.entryNodeArray (i).key); Put (encodedFile, "', ");
+         end if;
+      end loop;
+      New_Line (encodedFile);
    end PutSymbols;
 
 
-   procedure InfixBrowsing (binaryTree : in tree; encodedFile : in out File_Type; infixTree : out Unbounded_String) is
+   procedure InfixBrowsing (binaryTree : in treeNodePointer; infixTree : out Unbounded_String; it : in out Integer) is
+   
+   current, previous : treeNodePointer;
+   
    begin
-      Null;
+      current := binaryTree;
+      while current.leftChild /= null loop
+         infixTree := infixTree & "0";
+         previous := current;
+         current := current.leftChild;
+      end loop;
+      infixTree := infixTree & "1";
+      if previous.rightChild.leftChild = null  and it /= 1 then
+         InfixBrowsing (root.rightChild, infixTree, 0);
+      end if;
    end InfixBrowsing;
 
 
-   procedure EncodeText (encodedFile : in out File_Type; encodedSymbols : in hashMap) is
+   procedure EncodeText (inputFile : in File_Type; encodedFile : in out File_Type; encodedSymbols : in hashMap2) is
+   
+   fileCharacter : String (1 .. 1);
+   result : String (1 .. 8);
+   hashedKey : Integer;
+   
    begin
-      Null;
+      New_Line (encodedFile);
+      while not End_Of_File (inputFile) loop
+         for i in 1 .. 8 loop
+            Get (fileCharacter);
+            result (i) := fileCharacter (fileCharacter'First);
+            hashedKey := Hash2 (result);
+            Put (encodedFile, To_String (encodedSymbols.entryNodeArray (hashedKey).value)); Put (encodedFile, ".");
+         end loop;
+      end loop;
    end EncodeText;
+
+
+   procedure CreateFile (binaryTree : in tree; encodedSymbols : in hashMap; encodedFile : out File_Type) is
+
+   infixTree : Unbounded_String;
+
+   begin
+      Create (encodedFile, Out_File, "output.hff");
+      PutSymbols (encodedSymbols, encodedFile);
+      InfixBrowsing (binaryTree, encodedFile, infixTree);
+      EncodeText (inputFile, encodedFile, encodedSymbols);
+   end CreateFile;
 
 end COMPRESSION;

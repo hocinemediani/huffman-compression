@@ -55,6 +55,21 @@ package body THCharCode is
    end GetSize2;
 
 
+   function Hash2 (Key : in String) return Integer is  
+
+   result : Integer := 0;
+
+   begin
+      for i in 1 .. 8 loop
+         if Integer'Value (Key (i)'Image) = 1 then
+            result := result + 2 ** (8 - i);
+         end if;
+      end loop;
+
+      return result;
+   end Hash;
+
+
    procedure Register2 (HashTable : in out hashMap2; Key : in String; Value : in String) is
 
    current, previous, firstNode : entryNodePointer2;

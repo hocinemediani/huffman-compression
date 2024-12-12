@@ -9,8 +9,8 @@ package THCharCode is
    type nodeArray2 is array (0 .. 256) of entryNodePointer2;
 
    type entryNode2 is record
-      key : String;
-      value : String;
+      key : Unbounded_String;
+      value : Unbounded_String;
       -- Only used if two or more nodes have the same hashed key.
       next : entryNodePointer2;
    end record;
@@ -41,6 +41,10 @@ package THCharCode is
    function GetSize2 (HashTable : in hashMap2) return Integer with
       Post => GetSize2'Result >= 0
          and (GetSize2'Result = 0) = IsEmpty2 (HashTable);
+
+
+   -- Hash a key.
+   function Hash2 (Key : in String) return Integer;
 
 
    -- Registers a new value associated to a key or update it.
