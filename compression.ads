@@ -9,11 +9,12 @@ package COMPRESSION is
 
    type treeNodePointer is access treeNode;
 
-   type treeNodeArray is array (0 .. 256) of treeNodePointer;
+   type treeNodeArray is array (1 .. 128) of treeNodePointer;
 
-   type tree is record
-      root : treeNodePointer;
-      treeArray : treeNodeArray;
+   type treeQueue is record
+      last : treeNodePointer;
+      storageArray : treeNodeArray;
+      realSize : Integer;
    end record;
 
 	type treeNode is record
@@ -35,30 +36,24 @@ package COMPRESSION is
 
 
    -- Build the Huffman tree from the symbols and their number of occurences
-	procedure BuildHuffmanTree (symbolsHashTable: in hashMap; binaryTree : out tree) with
+	procedure BuildHuffmanTree (symbolsHashTable : in hashMap; binaryTree : out treeNodePointer) with
          Pre => symbolsHashTable.size > 0,
          Post => binaryTree.root /= Null;
 
    -- This procedure will create the Huffman Tree from the characters present in the text files and their occurences.
       -- First we need to order the indexes of the characters in the hash table from lowest occurence to highest.
-      procedure SortHashTable (symbolsHashTable : in hashMap; sortedHashTable : out hashMap) with
-            Pre => symbolsHashTable.size > 0,
-            Post => sortedHashTable.size > 0;
+      procedure SortArray (storageTree : in out treeQueue) with
+            Pre => storageTree.realSize > 0,
+            Post => storageTree.realSize > 0;
 
       -- Then at each iterations, we take the two least used characters and create a node.
          -- The resulting node has a nul character, thus indicating that it is only a node with a weight, not characters.
          -- We also keep track of the created sub-trees in the treeArray
-         procedure CreateNode (firstNode : in treeNode; secondNode : in treeNode; resultNode : out treeNode; treeArray : out treeNodeArray);
+         procedure CreateNode (storageTree : in out treeQueue);
          -- We then put the node in the hash map, where it would be stored if it was a character.
-         procedure PutNode (node : in treeNode; sortedHashTable : in hashMap; fullHashTable : out hashMap) with
-               Pre => sortedHashTable.size > 0,
-               Post => fullHashTable.size > 0;
-
          -- And we call BuildHuffmanTree again, with the fullHashTable as the first argument.
          -- The iterations stop when we only have one entry in the hash table, with a nul character.
          -- We also need to update the tree structure each time we create a new node (some nodes will point to another, some will be pointed to).
-         procedure UpdateTree (treeArray : in treeNodeArray; binaryTree : out tree) with
-               Post => binaryTree.root /= Null;
         
    -- Store the encoding of each symbols in a new hash table.
 	procedure GetTextCode (binaryTree : in tree; symbolsHashTable : in hashMap; encodedSymbols : out hashMap) with

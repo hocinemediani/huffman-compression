@@ -6,7 +6,7 @@ package TH is
 
    type entryNodePointer is access entryNode;
 
-   type nodeArray is array (0 .. 256) of entryNodePointer;
+   type nodeArray is array (1 .. 128) of entryNodePointer;
 
    type entryNode is record
       key : String (1 .. 8);

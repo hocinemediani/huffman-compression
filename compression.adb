@@ -1,6 +1,6 @@
 package body COMPRESSION is
 
-   hashTableSize : CONSTANT Integer := 256;
+   hashTableSize : CONSTANT Integer := 128;
 
    procedure GetSymbols (textToCompress : in out File_type; symbolsHashTable : out hashMap) is
 
@@ -22,40 +22,68 @@ package body COMPRESSION is
             Register (symbolsHashTable, result, ValueOf (symbolsHashTable, result) + 1);
          end if;
       end loop;
+      Register (symbolsHashTable, "11111111", 0);
       Close (textToCompress);
    end GetSymbols;
 
 
-   procedure BuildHuffmanTree (symbolsHashTable: in hashMap; binaryTree : out tree) is
+-- Beginning of BuildHuffmanTree
+   procedure SortArray (storageTree : in out treeQueue) is
+   
+   intermediateValue : Integer;
+
    begin
-      Null;
-   end BuildHuffmanTree;
+      for i in 1 .. storageTree.realSize loop
+         for j in 1 .. storageTree.realSize loop
+            if storageTree.storageArray (j).All.occurrences < storageTree.storageArray (j + 1).All.occurrences then
+               intermediateValue := storageTree.storageArray (j).All.occurrences;
+               storageTree.storageArray (j).All.occurrences := storageTree.storageArray (j + 1).All.occurrences;
+               storageTree.storageArray (j + 1).All.occurrences := intermediateValue;
+            end if;
+         end loop;
+      end loop;
+   end SortArray;
 
 
-   procedure SortHashTable (symbolsHashTable : in hashMap; sortedHashTable : out hashMap) is
+   procedure CreateNode (storageTree : in out treeQueue) is
+
+   firstNode : treeNodePointer := storageTree.storageArray (storageTree.realSize);
+   secondNode : treeNodePointer := storageTree.storageArray (storageTree.realSize - 1);
+
    begin
-      Null;
-   end SortHashTable;
-
-
-   procedure CreateNode (firstNode : in treeNode; secondNode : in treeNode; resultNode : out treeNode; treeArray : out treeNodeArray) is
-   begin
-      Null;
+      secondNode.All.leftChild := firstNode;
+      secondNode.All.rightChild := secondNode;
+      secondNode.All.symbol := "--------";
+      secondNode.All.occurrences := secondNode.occurrences + firstNode.occurrences;
+      storageTree.last := secondNode;
+      storageTree.realSize := storageTree.realSize - 1;
    end CreateNode;
 
 
-   procedure PutNode (node : in treeNode; sortedHashTable : in hashMap; fullHashTable : out hashMap) is
+
+   procedure BuildHuffmanTree (symbolsHashTable : in hashMap; binaryTree : out treeNodePointer) is
+   
+   capacity : CONSTANT Integer := symbolsHashTable.size;
+   current : Integer := 1;
+   storageTree : treeQueue;
+   
    begin
-      Null;
-   end PutNode;
+      for i in 1 .. hashTableSize loop
+         if symbolsHashTable.entryNodeArray (i) /= null then
+            storageTree.storageArray (current) := new treeNode' (symbolsHashTable.entryNodeArray (i).key, symbolsHashTable.entryNodeArray (i).value, null, null);
+            current := current + 1;
+         end if;
+      end loop;
+      storageTree.realSize := current - 1;
+      while storageTree.realSize /= 1 loop
+         SortArray (storageTree);
+         CreateNode (storageTree);
+      end loop;
+      binaryTree := storageTree.storageArray (1);
+   end BuildHuffmanTree;
 
 
-   procedure UpdateTree (treeArray : in treeNodeArray; binaryTree : out tree) is
-   begin
-      Null;
-   end UpdateTree;
-
-
+-- Beginning of GetTextCode
    procedure GetTextCode (binaryTree : in tree; symbolsHashTable : in hashMap; encodedSymbols : out hashMap) is
    begin
       Null;
