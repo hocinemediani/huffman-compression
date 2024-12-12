@@ -30,8 +30,9 @@ procedure COMPRESSION_TEST is
    -- Used to initialise a hash table with the characters present in the inputFile.
    arrayLength : CONSTANT Integer := 11;
 
-   Symbols : CONSTANT array (0 .. arrayLength) of characterByte
-      := (111, 109, 110, 97, 112, 115, 116, 98, 255, 108, 32, 101);
+   Symbols : CONSTANT array (0 .. arrayLength) of String (0 .. 7)
+      := ("01101111", "01101101", "01101110", "01100001", "01110000", "01110011", "01110100", "01100010", "01111111", "01101100", "00100000", "01100101");
+      --  111, 109, 110, 97,  112, 115, 116, 98,  255, 108, 32,  101
       --  'o', 'm', 'n', 'a', 'p', 's', 't', 'b', '$', 'l', ' ', 'e'
    
    Occurences : CONSTANT array (0 .. arrayLength) of Integer

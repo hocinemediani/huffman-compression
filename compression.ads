@@ -17,7 +17,7 @@ package COMPRESSION is
    end record;
 
 	type treeNode is record
-		symbol : Character;
+		symbol : String (1 .. 8);
 		occurrences : Integer;
 		rightChild : treeNodePointer;
 		leftChild : treeNodePointer;

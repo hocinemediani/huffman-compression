@@ -4,24 +4,29 @@ package body COMPRESSION is
 
    procedure GetSymbols (textToCompress : in out File_type; symbolsHashTable : out hashMap) is
 
-   fileCharacter : characterByte;
+   fileCharacter : String (1 .. 1);
+   result : String (1 .. 8);
 
    begin
       InitialiseHashTable (symbolsHashTable, hashTableSize);
       Open (textToCompress, In_File, "input.txt");
       while not End_Of_File (textToCompress) loop
-         Get (fileCharacter);
-         if IsIn (symbolsHashTable, fileCharacter) then
-            Register (symbolsHashTable, fileCharacter, 1);
+         result := "00000000";
+         for i in 1 .. 8 loop
+            Get (fileCharacter);
+            result (i) := fileCharacter (fileCharacter'First);
+         end loop;
+         if IsIn (symbolsHashTable, result) then
+            Register (symbolsHashTable, result, 1);
          else
-            Register (symbolsHashTable, fileCharacter, ValueOf (symbolsHashTable, fileCharacter) + 1);
+            Register (symbolsHashTable, result, ValueOf (symbolsHashTable, result) + 1);
          end if;
       end loop;
       Close (textToCompress);
    end GetSymbols;
 
 
-   procedure BuildHuffmanTree (textToCompress : in File_type; binaryTree : out tree) is
+   procedure BuildHuffmanTree (symbolsHashTable: in hashMap; binaryTree : out tree) is
    begin
       Null;
    end BuildHuffmanTree;
@@ -91,11 +96,5 @@ package body COMPRESSION is
    begin
       Null;
    end EncodeText;
-
-
-   procedure GetTextCode (symbolsHashTable : in hashMap; encodedSymbols : out hashMap) is
-   begin
-      InitialiseHashTable (encodedSymbols, hashTableSize);
-   end GetTextCode;
 
 end COMPRESSION;

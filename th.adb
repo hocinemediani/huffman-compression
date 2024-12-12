@@ -55,13 +55,22 @@ package body TH is
    end GetSize;
 
 
-   function Hash (Key : in characterByte) return Integer is
+   function Hash (Key : in String) return Integer is
+
+   result : Integer := 0;
+
    begin
-      return Integer (Key);
+      for i in 1 .. 8 loop
+         if Integer'Value (Key (i)'Image) = 1 then
+            result := result + 2 ** (8 - i);
+         end if;
+      end loop;
+
+      return result;
    end Hash;
 
 
-   procedure Register (HashTable : in out hashMap; Key : in characterByte; Value : in Integer) is
+   procedure Register (HashTable : in out hashMap; Key : in String; Value : in Integer) is
 
    current, previous, firstNode : entryNodePointer;
    hashedKey : CONSTANT Integer := Hash (Key);
@@ -91,7 +100,7 @@ package body TH is
    end Register;
 
 
-   procedure Delete (HashTable : in out hashMap; Key : in characterByte) is
+   procedure Delete (HashTable : in out hashMap; Key : in String) is
 
    previous, current : entryNodePointer;
    hashedKey : CONSTANT Integer := Hash (Key);
@@ -120,7 +129,7 @@ package body TH is
    end Delete;
 
 
-   function IsIn (HashTable : in hashMap; Key : in characterByte) return Boolean is
+   function IsIn (HashTable : in hashMap; Key : in String) return Boolean is
     
    current : entryNodePointer;
    hashedKey : CONSTANT Integer := Hash (Key);
@@ -137,7 +146,7 @@ package body TH is
    end IsIn;
 
 
-   function ValueOf (HashTable : in hashMap; Key : in characterByte) return Integer is
+   function ValueOf (HashTable : in hashMap; Key : in String) return Integer is
 
    current : entryNodePointer;
    hashedKey : CONSTANT Integer := Hash (Key);
@@ -154,9 +163,9 @@ package body TH is
    end ValueOf;
 
 
-   procedure Display (Key : in characterByte; Value : in Integer) is
+   procedure Display (Key : in String; Value : in Integer) is
    begin
-      Put("-->["); Put ('"'); Put (Integer (Key), 1); Put ('"'); Put (" : "); Put (Value, 1); Put("]");
+      Put("-->["); Put ('"'); Put (Key); Put ('"'); Put (" : "); Put (Value, 1); Put("]");
    end Display;
 
 

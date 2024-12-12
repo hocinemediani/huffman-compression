@@ -9,8 +9,8 @@ package THCharCode is
    type nodeArray2 is array (0 .. 256) of entryNodePointer2;
 
    type entryNode2 is record
-      key : Character;
-      value : Integer;
+      key : String;
+      value : String;
       -- Only used if two or more nodes have the same hashed key.
       next : entryNodePointer2;
    end record;
@@ -25,55 +25,55 @@ package THCharCode is
 
 
    -- Initialize an empty hash map.
-   procedure InitialiseHashTable2 (HashTable : in out hashMap; Length : in Integer) with
+   procedure InitialiseHashTable2 (HashTable : in out hashMap2; Length : in Integer) with
       Post => IsEmpty2 (HashTable);
 
 
    -- Destroy the hash map.
-   procedure DestroyHashTable2 (HashTable : in out hashMap);
+   procedure DestroyHashTable2 (HashTable : in out hashMap2);
 
 
    -- Check if a hash map is empty.
-   function IsEmpty2 (HashTable : in hashMap) return Boolean;
+   function IsEmpty2 (HashTable : in hashMap2) return Boolean;
 
 
    -- Get the number of elements in a hash map.
-   function GetSize2 (HashTable : in hashMap) return Integer with
+   function GetSize2 (HashTable : in hashMap2) return Integer with
       Post => GetSize2'Result >= 0
          and (GetSize2'Result = 0) = IsEmpty2 (HashTable);
 
 
    -- Registers a new value associated to a key or update it.
-   procedure Register2 (HashTable : in out hashMap; Key : in Character; Value : in Integer) with
+   procedure Register2 (HashTable : in out hashMap2; Key : in String; Value : in String) with
       Post => IsIn2 (HashTable, Key) and (ValueOf2 (HashTable, Key) = Value)
          and (not (IsIn2 (HashTable, Key)'Old) or GetSize2 (HashTable) = GetSize2 (HashTable)'Old)
          and (IsIn2 (HashTable, Key)'Old or GetSize2 (HashTable) = GetSize2 (HashTable)'Old + 1);
 
 
    -- Deletes a node in the hash map with the exception Cle_Absente_Exception.
-   procedure Delete2 (HashTable : in out hashMap; Key : in Character) with
+   procedure Delete2 (HashTable : in out hashMap2; Key : in String) with
       Post => GetSize2 (HashTable) = GetSize2 (HashTable)'Old - 1
          and not IsIn2 (HashTable, Key);
 
 
    -- Check if a key is in the hash map.
-   function IsIn2 (HashTable : in hashMap; Key : in Character) return Boolean;
+   function IsIn2 (HashTable : in hashMap2; Key : in String) return Boolean;
 
 
    -- Get the value associated to a key with the exception Cle_Absente_Exception.
-   function ValueOf2 (HashTable : in hashMap; Key : in Character) return Integer;
+   function ValueOf2 (HashTable : in hashMap2; Key : in String) return String;
 
 
    -- Display a node.
-   procedure Display2 (Key : in Character; Value : in Integer);
+   procedure Display2 (Key : in String; Value : in String);
 
 
    -- Display the hash map.
-   procedure DisplayHashTable2 (HashTable : in hashMap);
+   procedure DisplayHashTable2 (HashTable : in hashMap2);
 
    -- Apply a treatment to all of the hash table.
    generic
-		with procedure Treat2 (Cle : in Character; Valeur: in Integer);
-	procedure ForAll2 (HashTable : in hashMap);
+		with procedure Treat2 (Cle : in String; Valeur: in String);
+	procedure ForAll2 (HashTable : in hashMap2);
 
 end THCharCode;

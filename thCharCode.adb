@@ -55,7 +55,7 @@ package body THCharCode is
    end GetSize2;
 
 
-   procedure Register2 (HashTable : in out hashMap2; Key : in Character; Value : in Integer) is
+   procedure Register2 (HashTable : in out hashMap2; Key : in String; Value : in String) is
 
    current, previous, firstNode : entryNodePointer2;
    hashedKey : CONSTANT Integer := Character'Pos (Key);
@@ -85,7 +85,7 @@ package body THCharCode is
    end Register2;
 
 
-   procedure Delete2 (HashTable : in out hashMap2; Key : in Character) is
+   procedure Delete2 (HashTable : in out hashMap2; Key : in String) is
 
    previous, current : entryNodePointer2;
    hashedKey : CONSTANT Integer := Character'Pos (Key);
@@ -114,7 +114,7 @@ package body THCharCode is
    end Delete2;
 
 
-   function IsIn2 (HashTable : in hashMap2; Key : in Character) return Boolean is
+   function IsIn2 (HashTable : in hashMap2; Key : in String) return Boolean is
     
    current : entryNodePointer2;
    hashedKey : CONSTANT Integer := Character'Pos (Key);
@@ -131,7 +131,7 @@ package body THCharCode is
    end IsIn2;
 
 
-   function ValueOf2 (HashTable : in hashMap2; Key : in Character) return Integer is
+   function ValueOf2 (HashTable : in hashMap2; Key : in String) return String is
 
    current : entryNodePointer2;
    hashedKey : CONSTANT Integer := Character'Pos (Key);
@@ -148,9 +148,9 @@ package body THCharCode is
    end ValueOf2;
 
 
-   procedure Display2 (Key : in Character; Value : in Integer) is
+   procedure Display2 (Key : in String; Value : in String) is
    begin
-      Put("-->["); Put ('"'); Put (Key); Put ('"'); Put (" : "); Put (Value, 1); Put("]");
+      Put("-->["); Put ('"'); Put (Key); Put ('"'); Put (" : "); Put (Value); Put("]");
    end Display2;
 
 
