@@ -16,6 +16,7 @@ package body COMPRESSION is
 
    begin
       InitialiseHashTable (symbolsHashTable, hashTableSize);
+      Open (textToCompress, In_File, Argument (1));
       while not End_Of_File (textToCompress) loop
          result := "00000000";
          for i in 1 .. 8 loop
@@ -29,7 +30,7 @@ package body COMPRESSION is
          end if;
       end loop; 
       Register (symbolsHashTable, "11111111", 0);
-      DisplayHashTable (symbolsHashTable);
+      Close (textToCompress);
    end GetSymbols;
 
 
@@ -123,7 +124,6 @@ package body COMPRESSION is
    begin
       InitialiseHashTable2 (encodedSymbols, hashTableSize);
       ExploreTree (binaryTree, code, encodedSymbols);
-      DisplayHashTable2 (encodedSymbols);
    end GetTextCode;
 
 
@@ -176,16 +176,19 @@ package body COMPRESSION is
    hashedKey : Integer;
    
    begin
-      Open (textToCompress, In_File);
+      Open (textToCompress, In_File, Argument (1));
       New_Line (encodedFile);
       while not End_Of_File (textToCompress) loop
          for i in 1 .. 8 loop
-            Get (fileCharacter);
+            Get (textToCompress, fileCharacter);
             result (i) := fileCharacter (fileCharacter'First);
-            hashedKey := HashKey2 (result);
-            Put (encodedFile, To_String (encodedSymbols.entryNodeArray (hashedKey).value)); Put (encodedFile, ".");
          end loop;
+         hashedKey := HashKey2 (result);
+         Put (encodedFile, To_String (encodedSymbols.entryNodeArray (hashedKey).value)); Put (encodedFile, ".");
       end loop;
+      Put (encodedFile, To_String (encodedSymbols.entryNodeArray (255).value));
+      Close (textToCompress);
+      Close (encodedFile);
    end EncodeText;
 
 
@@ -194,13 +197,9 @@ package body COMPRESSION is
    inputFile : File_Type;
 
    begin
-      Put_Line ("ici");
       Create (encodedFile, Out_File, "output.txt.hff");
-      Put_Line ("ici");
       PutSymbols (encodedSymbols, encodedFile);
-      Put_Line ("ici");
       EncodeText (inputFile, encodedFile, encodedSymbols);
-      Put_Line ("ici");
    end CreateFile;
 
 
@@ -229,34 +228,16 @@ package body COMPRESSION is
    infixTree : Unbounded_String;
 
 procedure MainProcedure is
-
    begin
-      if Argument_Count = 1 then
-         Open (textToCompress, 
-               In_File, 
-               Argument (1));
-      elsif Argument_Count = 2 then
-         if Argument (1) = "-b" then
-            Put_Line ("Le mode selectionné est bavard");
-         end if;
-         Open (textToCompress, 
-               In_File, 
-               Argument (2));
-      elsif Argument_Count = 0 then
-         Put_Line ("Compression s'utilise de cette manière :");
-         Put_Line ("    /compression -b texte.txt");
-         Put_Line ("OU  /compression texte.txt");
-      else
-         Put_Line ("ntm mets au max 2 arguments");
+      if Argument_Count /= 1 then
+         Put ("compresser ne prends qu'un argument (le texte.txt)");
+         return;
       end if;
-
       GetSymbols (textToCompress, symbolsHashTable);
       BuildHuffmanTree (symbolsHashTable, binaryTree);
       GetTextCode (binaryTree, encodedSymbols);
       CreateFile (storageTree, symbolsHashTable, binaryTree, encodedSymbols, encodedFile, infixTree);
       DestroyEverything (symbolsHashTable, encodedSymbols, storageTree.storageArray);
-      Close (textToCompress);
-      Close (encodedFile);
 
    end MainProcedure;
 
