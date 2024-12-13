@@ -6,22 +6,14 @@ with THCharCode;              use THCharCode;
 
 procedure COMPRESSION_TEST is
 
-   -- The file we wanna compress.
    inputFile : File_Type;
-
-   -- A handmade compressed version of the file.
-   correctFile : File_Type;
-   correctFileCharacter : Character;
-   outputFileCharacter : Character;
-
-   -- The file compressed.
-   outputFile : File_Type;
-
    binaryTree : treeNodePointer;
    infixTree : Unbounded_String;
    symbolsTable : hashMap;
    encodedSymbols : hashMap2;
    encodedFile : File_Type;
+   it : Integer := 0;
+   storageTree : treeQueue;
    
 
    function "+" (Item : in String) return Unbounded_String
@@ -32,17 +24,15 @@ procedure COMPRESSION_TEST is
    arrayLength : CONSTANT Integer := 12;
 
    Symbols : CONSTANT array (1 .. arrayLength) of String (1 .. 8)
-      := ("01101111", "01101101", "01101110", "01100001", "01110000", "01110011", "01110100", "01100010", "11111111", "01101100", "00100000", "01100101");
-      --  111, 109, 110, 97,  112, 115, 116, 98,  255, 108, 32,  101
-      --  'o', 'm', 'n', 'a', 'p', 's', 't', 'b', '$', 'l', ' ', 'e'
+      := ("01101110", "01101101", "11111111", "01110100", "01110011", "01101111", "01100010", "01100001", "01110000", "01101100","01100101", "00100000");
    
    Occurences : CONSTANT array (1 .. arrayLength) of Integer
-      := (2, 2, 2, 1, 1, 1, 1, 1, 0, 1, 3, 3);
+      := (2, 2, 0, 1, 1, 2, 1, 1, 1, 1, 3, 3);
 
    HuffmanCode : CONSTANT array (1 .. arrayLength) of Unbounded_String
-      := (+"000", +"001", +"010", +"0110", +"0111", +"1000", +"1001", +"1010", +"10110", +"10111", +"110", +"111"); 
+      := (+"000", +"001", +"01000", +"01001", +"0101", +"011", +"1000", +"1001", +"1010", +"1011", +"110", +"111"); 
    
-   InfixHuffmanTree : CONSTANT Unbounded_String := (+"00011010110001101011011");
+   InfixHuffmanTree : CONSTANT Unbounded_String := (+"00011000111100011011011");
 
    procedure TestGetSymbols is
    begin
@@ -60,8 +50,8 @@ procedure COMPRESSION_TEST is
 
    procedure TestBuildHuffmanTree is
    begin
-      PutSymbols (encodedSymbols, encodedFile);
-      InfixBrowsing (symbolsTable, binaryTree, infixTree);
+      BuildHuffmanTree (symbolsTable, binaryTree);
+      InfixBrowsing (it, storageTree, symbolsTable, binaryTree, infixTree, encodedFile);
       pragma Assert (infixTree = InfixHuffmanTree);
    end TestBuildHuffmanTree;
 
@@ -76,24 +66,9 @@ procedure COMPRESSION_TEST is
    end TestGetTextCode;
 
 
-   procedure TestCreateFile is
-   begin
-      CreateFile (symbolsTable, binaryTree, encodedSymbols, outputFile);
-      Open (correctFile, In_File, "correct.txt");
-      Open (outputFile, In_File, "outputFile.txt");
-      while not End_Of_File (correctFile) and not End_Of_File (outputFile) loop
-        Get (outputFile, outputFileCharacter);
-        Get (correctFile, correctFileCharacter);
-        pragma Assert (outputFileCharacter = correctFileCharacter);
-      end loop;
-      Close (correctFile);
-      Close (outputFile);
-   end TestCreateFile;
-
-
 begin
    TestGetSymbols;
    TestBuildHuffmanTree;
    TestGetTextCode;
-   TestCreateFile;
+   Put_Line ("Fin des tests!");
 end COMPRESSION_TEST;

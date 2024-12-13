@@ -16,7 +16,7 @@ package body COMPRESSION is
 
    begin
       InitialiseHashTable (symbolsHashTable, hashTableSize);
-      Open (textToCompress, In_File, Argument (1));
+      Open (textToCompress, In_File, Argument (Argument_Count));
       while not End_Of_File (textToCompress) loop
          result := "00000000";
          for i in 1 .. 8 loop
@@ -176,7 +176,7 @@ package body COMPRESSION is
    hashedKey : Integer;
    
    begin
-      Open (textToCompress, In_File, Argument (1));
+      Open (textToCompress, In_File, Argument (Argument_Count));
       New_Line (encodedFile);
       while not End_Of_File (textToCompress) loop
          for i in 1 .. 8 loop
@@ -209,8 +209,10 @@ package body COMPRESSION is
    begin
       DestroyHashTable (symbolsHashTable);
       DestroyHashTable2 (encodedSymbols);
-      for i in 1 .. 128 loop
-         Free3 (treeStorageArray (i));
+      for i in 1 .. 256 loop
+         if treeStorageArray (i) /= null then
+            Free3 (treeStorageArray (i));
+         end if;
       end loop;
    end DestroyEverything;
 
@@ -229,20 +231,35 @@ package body COMPRESSION is
    encodedFile : File_Type;
    infixTree : Unbounded_String;
    fileName : Unbounded_String;
+   mode : Boolean := True;
 
 procedure MainProcedure is
-   begin
-      if Argument_Count /= 1 then
-         Put ("compresser ne prends qu'un argument (le texte.txt)");
-         return;
-      end if;
 
-      fileName := To_Unbounded_String (Argument (1)) & ".hff";
+   begin
+      if Argument_Count = 1 then
+         fileName := To_Unbounded_String (Argument (1)) & ".hff";
+         Put_Line ("Mode bavard");
+      elsif Argument_Count = 0 then
+         Put_Line ("Compresser prend en parametre au moins un argument (dans ce cas la, le nom de fichier avec son extension)");
+         return;
+      elsif Argument_Count > 1 then
+         fileName := To_Unbounded_String (Argument (Argument_Count)) & ".hff";
+         if Argument (Argument_Count - 1) = "-s" then
+            mode := False;
+            Put_Line ("Mode Silencieux");
+         else 
+            mode := True;
+            Put_Line ("Mode Bavard");
+         end if;
+      end if;
 
       GetSymbols (textToCompress, symbolsHashTable);
       BuildHuffmanTree (symbolsHashTable, binaryTree);
       GetTextCode (binaryTree, encodedSymbols);
       CreateFile (fileName, storageTree, symbolsHashTable, binaryTree, encodedSymbols, encodedFile, infixTree);
+      if mode then
+         DisplayHuffmanTree (binaryTree, storageTree.storageArray);
+      end if;
       DestroyEverything (symbolsHashTable, encodedSymbols, storageTree.storageArray);
 
    end MainProcedure;
