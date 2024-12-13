@@ -130,10 +130,17 @@ package body COMPRESSION is
 
 -- Beginning of CreateFile.
    procedure PutSymbols (encodedSymbols : in hashMap2; encodedFile : in out File_Type) is
+
+   ind : Integer := 1;
+
    begin
       for i in 1 .. encodedSymbols.length loop
          if encodedSymbols.entryNodeArray (i) /= null then
-            Put (encodedFile, "'"); Put (encodedFile, To_String (encodedSymbols.entryNodeArray (i).key)); Put (encodedFile, "', ");
+            if ind = encodedSymbols.size then
+               Put (encodedFile, To_String (encodedSymbols.entryNodeArray (i).key));
+            end if;
+            Put (encodedFile, To_String (encodedSymbols.entryNodeArray (i).key));
+            ind := ind + 1;
          end if;
       end loop;
       New_Line (encodedFile);
