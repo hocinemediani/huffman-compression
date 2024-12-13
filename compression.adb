@@ -30,26 +30,25 @@ package body COMPRESSION is
       end loop; 
       Register (symbolsHashTable, "11111111", 0);
       DisplayHashTable (symbolsHashTable);
-      Close (textToCompress);
    end GetSymbols;
 
 
 -- Beginning of BuildHuffmanTree.
    procedure SortArray (storageTree : in out treeQueue) is
    
-   intermediateValue : Integer;
+   intermediateValue : treeNodePointer;
 
    begin
-      for i in 1 .. storageTree.realSize loop
-         for j in 1 .. storageTree.realSize loop
-            if storageTree.storageArray (j).All.occurrences < storageTree.storageArray (j + 1).All.occurrences then
-               intermediateValue := storageTree.storageArray (j).All.occurrences;
-               storageTree.storageArray (j).All.occurrences := storageTree.storageArray (j + 1).All.occurrences;
-               storageTree.storageArray (j + 1).All.occurrences := intermediateValue;
+      for i in 1 .. (storageTree.realSize - 1) loop
+         for j in 1 .. (storageTree.realSize - 1) loop
+            if storageTree.storageArray (j).occurrences < storageTree.storageArray (j + 1).occurrences then
+               intermediateValue := storageTree.storageArray (j);
+               storageTree.storageArray (j) := storageTree.storageArray (j + 1);
+               storageTree.storageArray (j + 1) := intermediateValue;
             end if;
          end loop;
       end loop;
-   end SortArray;
+      end SortArray;
 
 
    procedure CreateNode (storageTree : in out treeQueue) is
@@ -79,16 +78,13 @@ package body COMPRESSION is
       for k in 1 .. 256 loop
          storageTree.storageArray (k) := null;
       end loop;
-      Put_Line ("on entre dans buildhuffmantree");
       for i in 1 .. hashTableSize loop
          if symbolsHashTable.entryNodeArray (i) /= null then
-            Put ("a la position numero"); Put_Line (Integer'Image (i));
             declare
                newNode : CONSTANT treeNodePointer := new treeNode' (symbolsHashTable.entryNodeArray (i).key, symbolsHashTable.entryNodeArray (i).value, null, null, null, False);
             begin
                storageTree.storageArray (current) := newNode;
                current := current + 1;
-               Put ("on a ajoute "); Put_Line (newNode.symbol);
             end;
          end if;
       end loop;
@@ -127,6 +123,7 @@ package body COMPRESSION is
    begin
       InitialiseHashTable2 (encodedSymbols, hashTableSize);
       ExploreTree (binaryTree, code, encodedSymbols);
+      DisplayHashTable2 (encodedSymbols);
    end GetTextCode;
 
 
@@ -143,44 +140,45 @@ package body COMPRESSION is
    end PutSymbols;
 
 
-   procedure InfixBrowsing (symbolsHashTable : in hashMap; binaryTree : in treeNodePointer; infixTree : out Unbounded_String) is
+   procedure InfixBrowsing (storageTree : in treeQueue; symbolsHashTable : in hashMap; binaryTree : in treeNodePointer; infixTree : out Unbounded_String) is
    
    current : treeNodePointer;
    
    begin
       current := binaryTree;
-      if current.parent = null and current.leftChild.isSeen and current.rightChild.isSeen then
+      if current = storageTree.storageArray (1) and current.leftChild /= null and current.leftChild.isSeen and current.rightChild /= null and current.rightChild.isSeen then
          Null;
       else
          if current.leftChild /= null then
             if current.leftChild.isSeen and current.rightChild.isSeen then
                current.All.isSeen := True;
-               InfixBrowsing (symbolsHashTable, current.parent, infixTree);
+               InfixBrowsing (storageTree, symbolsHashTable, current.parent, infixTree);
             elsif current.leftChild.isSeen then
-               InfixBrowsing (symbolsHashTable, current.rightChild, infixTree);
+               InfixBrowsing (storageTree, symbolsHashTable, current.rightChild, infixTree);
             else
                infixTree := infixTree & To_Unbounded_String ("0");
                current := current.leftChild;
-               InfixBrowsing (symbolsHashTable, current, infixTree);
+               InfixBrowsing (storageTree, symbolsHashTable, current, infixTree);
             end if;
          else
             current.All.isSeen := True;
             infixTree := infixTree & To_Unbounded_String ("1");
-            InfixBrowsing (symbolsHashTable, current.parent, infixTree);
+            InfixBrowsing (storageTree, symbolsHashTable, current.parent, infixTree);
          end if;
       end if;
    end InfixBrowsing;
 
 
-   procedure EncodeText (inputFile : in File_Type; encodedFile : in out File_Type; encodedSymbols : in hashMap2) is
+   procedure EncodeText (textToCompress : in out File_Type; encodedFile : in out File_Type; encodedSymbols : in hashMap2) is
    
    fileCharacter : String (1 .. 1);
    result : String (1 .. 8);
    hashedKey : Integer;
    
    begin
+      Open (textToCompress, In_File);
       New_Line (encodedFile);
-      while not End_Of_File (inputFile) loop
+      while not End_Of_File (textToCompress) loop
          for i in 1 .. 8 loop
             Get (fileCharacter);
             result (i) := fileCharacter (fileCharacter'First);
@@ -191,23 +189,18 @@ package body COMPRESSION is
    end EncodeText;
 
 
-   function GetInfixTree (symbolsHashTable : in hashMap; binaryTree : in treeNodePointer; infixTree : in out Unbounded_String) return String is
-   begin
-      InfixBrowsing (symbolsHashTable, binaryTree, infixTree);
-      return To_String (infixTree);
-   end GetInfixTree;
+   procedure CreateFile (storageTree : in treeQueue; symbolsHashTable : in hashMap; binaryTree : in treeNodePointer; encodedSymbols : in hashMap2; encodedFile : out File_Type; infixTree : in out Unbounded_String) is
 
-
-   procedure CreateFile (symbolsHashTable : in hashMap; binaryTree : in treeNodePointer; encodedSymbols : in hashMap2; encodedFile : out File_Type) is
-
-   infixTree : Unbounded_String := To_Unbounded_String ("");
    inputFile : File_Type;
 
    begin
+      Put_Line ("ici");
       Create (encodedFile, Out_File, "output.txt.hff");
+      Put_Line ("ici");
       PutSymbols (encodedSymbols, encodedFile);
-      Put (encodedFile, GetInfixTree (symbolsHashTable, binaryTree, infixTree));
+      Put_Line ("ici");
       EncodeText (inputFile, encodedFile, encodedSymbols);
+      Put_Line ("ici");
    end CreateFile;
 
 
@@ -233,6 +226,7 @@ package body COMPRESSION is
    binaryTree : treeNodePointer;
    encodedSymbols : hashMap2;
    encodedFile : File_Type;
+   infixTree : Unbounded_String;
 
 procedure MainProcedure is
 
@@ -259,8 +253,10 @@ procedure MainProcedure is
       GetSymbols (textToCompress, symbolsHashTable);
       BuildHuffmanTree (symbolsHashTable, binaryTree);
       GetTextCode (binaryTree, encodedSymbols);
-      CreateFile (symbolsHashTable, binaryTree, encodedSymbols, encodedFile);
+      CreateFile (storageTree, symbolsHashTable, binaryTree, encodedSymbols, encodedFile, infixTree);
       DestroyEverything (symbolsHashTable, encodedSymbols, storageTree.storageArray);
+      Close (textToCompress);
+      Close (encodedFile);
 
    end MainProcedure;
 
