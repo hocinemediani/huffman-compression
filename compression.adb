@@ -168,6 +168,36 @@ package body COMPRESSION is
    end InfixBrowsing;
 
 
+   procedure InfixBrowsingBavard (it : in out Integer; storageTree : in treeQueue; symbolsHashTable : in hashMap; binaryTree : in treeNodePointer; infixTree : out Unbounded_String; encodedFile : in out File_Type) is
+   
+   current : treeNodePointer;
+   
+   begin
+      if it < symbolsHashTable.size then
+         current := binaryTree;
+         if current.leftChild /= null then
+            if current.leftChild.isSeen and current.rightChild.isSeen then
+               current.isSeen := True;
+               InfixBrowsingBavard (it, storageTree, symbolsHashTable, current.parent, infixTree, encodedFile);
+            elsif current.leftChild.isSeen then
+               InfixBrowsingBavard (it, storageTree, symbolsHashTable, current.rightChild, infixTree, encodedFile);
+            else
+               infixTree := infixTree & To_Unbounded_String ("0");
+               current := current.leftChild;
+               InfixBrowsingBavard (it, storageTree, symbolsHashTable, current, infixTree, encodedFile);
+            end if;
+         else
+            current.isSeen := True;
+            infixTree := infixTree & To_Unbounded_String ("1");
+            it := it + 1;
+            PutSymbols (symbolsHashTable, it, current.symbol, encodedFile);
+            InfixBrowsingBavard (it, storageTree, symbolsHashTable, current.parent, infixTree, encodedFile);
+            Free3 (current);
+         end if;
+      end if;
+   end InfixBrowsingBavard;
+
+
    procedure EncodeText (textToCompress : in out File_Type; encodedFile : in out File_Type; encodedSymbols : in hashMap2) is
    
    fileCharacter : String (1 .. 1);
@@ -191,14 +221,18 @@ package body COMPRESSION is
    end EncodeText;
 
 
-   procedure CreateFile (fileName : in Unbounded_String; storageTree : in treeQueue; symbolsHashTable : in hashMap; binaryTree : in treeNodePointer; encodedSymbols : in hashMap2; encodedFile : out File_Type; infixTree : in out Unbounded_String) is
+   procedure CreateFile (modeBavard : in Boolean; fileName : in Unbounded_String; storageTree : in treeQueue; symbolsHashTable : in hashMap; binaryTree : in treeNodePointer; encodedSymbols : in hashMap2; encodedFile : out File_Type; infixTree : in out Unbounded_String) is
 
    inputFile : File_Type;
    it : Integer := 0;
 
    begin
       Create (encodedFile, Out_File, To_String (fileName));
-      InfixBrowsing (it, storageTree, symbolsHashTable, binaryTree, infixTree, encodedFile);
+      if modeBavard then
+         InfixBrowsingBavard (it, storageTree, symbolsHashTable, binaryTree, infixTree, encodedFile);
+      else 
+         InfixBrowsing (it, storageTree, symbolsHashTable, binaryTree, infixTree, encodedFile);
+      end if;
       Put (encodedFile, To_String (infixTree));
       EncodeText (inputFile, encodedFile, encodedSymbols);
    end CreateFile;
@@ -216,12 +250,6 @@ package body COMPRESSION is
    end DestroyEverything;
 
 
-   procedure DisplayHuffmanTree (binaryTree : treeNodePointer; treeArray : treeNodeArray) is
-   begin
-      Null;
-   end DisplayHuffmanTree;
-
-
    textToCompress : File_Type;
    symbolsHashTable : hashMap;
    storageTree : treeQueue;
@@ -230,7 +258,7 @@ package body COMPRESSION is
    encodedFile : File_Type;
    infixTree : Unbounded_String;
    fileName : Unbounded_String;
-   mode : Boolean := True;
+   modeBavard : Boolean := True;
 
 procedure MainProcedure is
    begin
@@ -243,10 +271,10 @@ procedure MainProcedure is
       elsif Argument_Count > 1 then
          fileName := To_Unbounded_String (Argument (Argument_Count)) & ".hff";
          if Argument (Argument_Count - 1) = "-s" then
-            mode := False;
+            modeBavard := False;
             Put_Line ("Mode Silencieux");
          else 
-            mode := True;
+            modeBavard := True;
             Put_Line ("Mode Bavard");
          end if;
       end if;
@@ -254,10 +282,7 @@ procedure MainProcedure is
       GetSymbols (textToCompress, symbolsHashTable);
       BuildHuffmanTree (symbolsHashTable, binaryTree);
       GetTextCode (binaryTree, encodedSymbols);
-      CreateFile (fileName, storageTree, symbolsHashTable, binaryTree, encodedSymbols, encodedFile, infixTree);
-      if mode then
-         DisplayHuffmanTree (binaryTree, storageTree.storageArray);
-      end if;
+      CreateFile (modeBavard, fileName, storageTree, symbolsHashTable, binaryTree, encodedSymbols, encodedFile, infixTree);
       DestroyEverything (symbolsHashTable, encodedSymbols, storageTree.storageArray);
    end MainProcedure;
 
