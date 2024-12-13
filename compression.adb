@@ -140,30 +140,29 @@ package body COMPRESSION is
    end PutSymbols;
 
 
-   procedure InfixBrowsing (storageTree : in treeQueue; symbolsHashTable : in hashMap; binaryTree : in treeNodePointer; infixTree : out Unbounded_String) is
+   procedure InfixBrowsing (it : in out Integer; storageTree : in treeQueue; symbolsHashTable : in hashMap; binaryTree : in treeNodePointer; infixTree : out Unbounded_String) is
    
    current : treeNodePointer;
    
    begin
-      current := binaryTree;
-      if current = storageTree.storageArray (1) and current.leftChild /= null and current.leftChild.isSeen and current.rightChild /= null and current.rightChild.isSeen then
-         Null;
-      else
+      if it < symbolsHashTable.size then
+         current := binaryTree;
          if current.leftChild /= null then
             if current.leftChild.isSeen and current.rightChild.isSeen then
-               current.All.isSeen := True;
-               InfixBrowsing (storageTree, symbolsHashTable, current.parent, infixTree);
+               current.isSeen := True;
+               InfixBrowsing (it, storageTree, symbolsHashTable, current.parent, infixTree);
             elsif current.leftChild.isSeen then
-               InfixBrowsing (storageTree, symbolsHashTable, current.rightChild, infixTree);
+               InfixBrowsing (it, storageTree, symbolsHashTable, current.rightChild, infixTree);
             else
                infixTree := infixTree & To_Unbounded_String ("0");
                current := current.leftChild;
-               InfixBrowsing (storageTree, symbolsHashTable, current, infixTree);
+               InfixBrowsing (it, storageTree, symbolsHashTable, current, infixTree);
             end if;
          else
-            current.All.isSeen := True;
+            current.isSeen := True;
             infixTree := infixTree & To_Unbounded_String ("1");
-            InfixBrowsing (storageTree, symbolsHashTable, current.parent, infixTree);
+            it := it + 1;
+            InfixBrowsing (it, storageTree, symbolsHashTable, current.parent, infixTree);
          end if;
       end if;
    end InfixBrowsing;
@@ -195,11 +194,12 @@ package body COMPRESSION is
    procedure CreateFile (fileName : in Unbounded_String; storageTree : in treeQueue; symbolsHashTable : in hashMap; binaryTree : in treeNodePointer; encodedSymbols : in hashMap2; encodedFile : out File_Type; infixTree : in out Unbounded_String) is
 
    inputFile : File_Type;
+   it : Integer := 0;
 
    begin
       Create (encodedFile, Out_File, To_String (fileName));
       PutSymbols (encodedSymbols, encodedFile);
-      InfixBrowsing (storageTree, symbolsHashTable, binaryTree, infixTree);
+      InfixBrowsing (it, storageTree, symbolsHashTable, binaryTree, infixTree);
       Put (encodedFile, To_String (infixTree));
       EncodeText (inputFile, encodedFile, encodedSymbols);
    end CreateFile;
