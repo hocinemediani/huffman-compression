@@ -5,7 +5,7 @@ with Ada.Unchecked_Deallocation;
 
 package body THCharCode is
 
-   procedure Free is
+   procedure Free2 is
       new Ada.Unchecked_Deallocation (Object => entryNode2, Name => entryNodePointer2);
 
 
@@ -31,10 +31,10 @@ package body THCharCode is
             while current /= null loop
                previous := current;
                current := previous.next;
-               Free (previous);
+               Free2 (previous);
             end loop;
-            Free (previous);
-            Free (current);
+            Free2 (previous);
+            Free2 (current);
          end if;
          HashTable.entryNodeArray (i) := null;
       end loop;
@@ -119,7 +119,7 @@ package body THCharCode is
             if current.next = null then
                previous.next := null;
             end if;
-            Free (current);
+            Free2 (current);
             HashTable.size := HashTable.size - 1;
             return;
          end if;

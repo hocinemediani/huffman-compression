@@ -4,3 +4,8 @@ th.ali
 th.o
 compression_test.o
 compression_test.ali
+compression_test.exe
+compression.ali
+compression.o
+thcharcode.ali
+thcharcode.o

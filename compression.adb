@@ -1,7 +1,11 @@
+with Ada.Unchecked_Deallocation;
+
 package body COMPRESSION is
 
    hashTableSize : CONSTANT Integer := 128;
 
+   procedure Free3 is
+      new Ada.Unchecked_Deallocation (Object => treeNode, Name => treeNodePointer);
 
 -- Beginning of GetSymbols.
    procedure GetSymbols (textToCompress : in out File_type; symbolsHashTable : out hashMap) is
@@ -125,9 +129,9 @@ package body COMPRESSION is
    end PutSymbols;
 
 
-   procedure InfixBrowsing (symbolsHashTable : in hashMap; binaryTree : in out treeNodePointer; infixTree : out Unbounded_String) is
+   procedure InfixBrowsing (symbolsHashTable : in hashMap; binaryTree : in treeNodePointer; infixTree : out Unbounded_String) is
    
-   current, previous : treeNodePointer;
+   current : treeNodePointer;
    
    begin
       current := binaryTree;
@@ -177,13 +181,25 @@ package body COMPRESSION is
 
    infixTree : Unbounded_String;
    inputFile : File_Type;
-   it : Integer := 0;
 
    begin
       Create (encodedFile, Out_File, "output.hff");
       PutSymbols (encodedSymbols, encodedFile);
-      InfixBrowsing (symbolsHashTable, binaryTree, infixTree, it);
+      InfixBrowsing (symbolsHashTable, binaryTree, infixTree);
       EncodeText (inputFile, encodedFile, encodedSymbols);
    end CreateFile;
+
+   procedure DestroyEverything (symbolsHashTable : in out hashMap; encodedSymbols: in out hashMap2; treeStorageArray : in out treeNodeArray) is
+   begin
+      DestroyHashTable (symbolsHashTable);
+      DestroyHashTable2 (encodedSymbols);
+      for i in 1 .. 128 loop
+         Free3 (treeStorageArray (i));
+      end loop;
+   end DestroyEverything;
+
+begin
+
+   
 
 end COMPRESSION;
