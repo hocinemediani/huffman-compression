@@ -55,17 +55,13 @@ procedure COMPRESSION_TEST is
       for j in 0 .. arrayLength loop
          pragma Assert (ValueOf (symbolsTable, Symbols (j)) = Occurences (j));
       end loop;
-
    end TestGetSymbols;
 
 
    procedure TestBuildHuffmanTree is
-   
-   it : Integer := 0;
-   
    begin
       PutSymbols (encodedSymbols, encodedFile);
-      InfixBrowsing (symbolsTable, binaryTree, infixTree, it);
+      InfixBrowsing (symbolsTable, binaryTree, infixTree);
       pragma Assert (infixTree = InfixHuffmanTree);
    end TestBuildHuffmanTree;
 

@@ -22,6 +22,8 @@ package COMPRESSION is
 		occurrences : Integer;
 		rightChild : treeNodePointer;
 		leftChild : treeNodePointer;
+      parent : treeNodePointer;
+      isSeen : Boolean;
 	end record;
 
    -- Store the sybols used in the text file.
@@ -58,8 +60,6 @@ package COMPRESSION is
    -- Store the encoding of each symbols in a new hash table.
 	procedure GetTextCode (binaryTree : in treeNodePointer; encodedSymbols : out hashMap2);
 
-   function GetRoot (symbolsHashTable : in hashMap; binaryTree : out treeNodePointer) return treeNodePointer;
-
    -- This procedure will encode each character by exploring the Huffman tree we created.
       -- So we need to explore the Tree until we have maped each character to a code.
       procedure ExploreTree (binaryTree : in treeNodePointer; code : in out Unbounded_String; encodedSymbols : in out hashMap2);
@@ -75,7 +75,7 @@ package COMPRESSION is
       -- We first need to put in the file every symbols used, sorted by number of occurences.
       procedure PutSymbols (encodedSymbols : in hashMap2; encodedFile : in out File_Type);
       -- Then we need to find the tree structure by infixed browsing of the tree and put it next to the characters used.
-      procedure InfixBrowsing (symbolsHashTable : in hashMap; binaryTree : in treeNodePointer; infixTree : out Unbounded_String; it : in out Integer);
+      procedure InfixBrowsing (symbolsHashTable : in hashMap; binaryTree : in out treeNodePointer; infixTree : out Unbounded_String);
       -- And finally we need to encode the text.
       -- For that, we iterate through the characters in the raw text file and we store the encoded version of it.
       procedure EncodeText (inputFile : in File_Type; encodedFile : in out File_Type; encodedSymbols : in hashMap2);

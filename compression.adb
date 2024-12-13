@@ -51,14 +51,15 @@ package body COMPRESSION is
 
    firstNode : CONSTANT treeNodePointer := storageTree.storageArray (storageTree.realSize);
    secondNode : CONSTANT treeNodePointer := storageTree.storageArray (storageTree.realSize - 1);
+   newNode : treeNodePointer;
 
    begin
-      secondNode.All.leftChild := firstNode;
-      secondNode.All.rightChild := secondNode;
-      secondNode.All.symbol := "--------";
-      secondNode.All.occurrences := secondNode.occurrences + firstNode.occurrences;
-      storageTree.last := secondNode;
+      newNode := new treeNode' ("--------", secondNode.occurrences + firstNode.occurrences, secondNode, firstNode, null, False);
+      firstNode.parent := newNode;
+      secondNode.parent := newNode;
+      storageTree.last := newNode;
       storageTree.realSize := storageTree.realSize - 1;
+      storageTree.storageArray (storageTree.realSize) := newNode;
    end CreateNode;
 
 
@@ -70,7 +71,7 @@ package body COMPRESSION is
    begin
       for i in 1 .. hashTableSize loop
          if symbolsHashTable.entryNodeArray (i) /= null then
-            storageTree.storageArray (current) := new treeNode' (symbolsHashTable.entryNodeArray (i).key, symbolsHashTable.entryNodeArray (i).value, null, null);
+            storageTree.storageArray (current) := new treeNode' (symbolsHashTable.entryNodeArray (i).key, symbolsHashTable.entryNodeArray (i).value, null, null, null, False);
             current := current + 1;
          end if;
       end loop;
@@ -81,13 +82,6 @@ package body COMPRESSION is
       end loop;
       binaryTree := storageTree.storageArray (1);
    end BuildHuffmanTree;
-
-
-   function GetRoot (symbolsHashTable : in hashMap; binaryTree : out treeNodePointer) return treeNodePointer is
-   begin
-      BuildHuffmanTree (symbolsHashTable, binaryTree);
-      return binaryTree;
-   end GetRoot;
 
 
 
@@ -131,21 +125,31 @@ package body COMPRESSION is
    end PutSymbols;
 
 
-   procedure InfixBrowsing (symbolsHashTable : in hashMap; binaryTree : in treeNodePointer; infixTree : out Unbounded_String; it : in out Integer) is
+   procedure InfixBrowsing (symbolsHashTable : in hashMap; binaryTree : in out treeNodePointer; infixTree : out Unbounded_String) is
    
    current, previous : treeNodePointer;
-   binaryTree2 : treeNodePointer := binaryTree;
    
    begin
       current := binaryTree;
-      while current.leftChild /= null loop
-         infixTree := infixTree & "0";
-         previous := current;
-         current := current.leftChild;
-      end loop;
-      infixTree := infixTree & "1";
-      if previous.rightChild.leftChild = null  and it /= 1 then
-         InfixBrowsing (symbolsHashTable, GetRoot (symbolsHashTable, binaryTree2), infixTree, it);
+      if current.parent = null and current.leftChild.isSeen and current.rightChild.isSeen then
+         Null;
+      else
+         if current.leftChild /= null then
+            if current.leftChild.isSeen and current.rightChild.isSeen then
+               current.All.isSeen := True;
+               InfixBrowsing (symbolsHashTable, current.parent, infixTree);
+            elsif current.leftChild.isSeen then
+               InfixBrowsing (symbolsHashTable, current.rightChild, infixTree);
+            else
+               infixTree := infixTree & To_Unbounded_String ("0");
+               current := current.leftChild;
+               InfixBrowsing (symbolsHashTable, current, infixTree);
+            end if;
+         else
+            current.All.isSeen := True;
+            infixTree := infixTree & To_Unbounded_String ("1");
+            InfixBrowsing (symbolsHashTable, current.parent, infixTree);
+         end if;
       end if;
    end InfixBrowsing;
 
