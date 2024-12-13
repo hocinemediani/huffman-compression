@@ -9,7 +9,7 @@ package COMPRESSION is
 
    type treeNodePointer is access treeNode;
 
-   type treeNodeArray is array (1 .. 128) of treeNodePointer;
+   type treeNodeArray is array (1 .. 256) of treeNodePointer;
 
    type treeQueue is record
       last : treeNodePointer;
@@ -25,6 +25,8 @@ package COMPRESSION is
       parent : treeNodePointer;
       isSeen : Boolean;
 	end record;
+
+   procedure MainProcedure;
 
    -- Store the sybols used in the text file.
 	procedure GetSymbols (textToCompress : in out File_Type; symbolsHashTable : out hashMap) with
@@ -80,6 +82,10 @@ package COMPRESSION is
       -- For that, we iterate through the characters in the raw text file and we store the encoded version of it.
       procedure EncodeText (inputFile : in File_Type; encodedFile : in out File_Type; encodedSymbols : in hashMap2);
 
+      function GetInfixTree (symbolsHashTable : in hashMap; binaryTree : in treeNodePointer; infixTree : in out Unbounded_String) return String;
+
       procedure DestroyEverything (symbolsHashTable : in out hashMap; encodedSymbols: in out hashMap2; treeStorageArray : in out treeNodeArray);
+
+      procedure DisplayHuffmanTree (binaryTree : treeNodePointer; treeArray : treeNodeArray);
 
 end COMPRESSION;

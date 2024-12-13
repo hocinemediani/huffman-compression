@@ -6,7 +6,7 @@ package TH is
 
    type entryNodePointer is access entryNode;
 
-   type nodeArray is array (1 .. 128) of entryNodePointer;
+   type nodeArray is array (1 .. 256) of entryNodePointer;
 
    type entryNode is record
       key : String (1 .. 8);
@@ -44,7 +44,7 @@ package TH is
 
 
    -- Hash a key.
-   function Hash (Key : in String) return Integer;
+   function HashKey (Key : in String) return Integer;
 
 
    -- Registers a new value associated to a key or update it.

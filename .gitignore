@@ -9,3 +9,6 @@ compression.ali
 compression.o
 thcharcode.ali
 thcharcode.o
+compresser.ali
+compresser.exe
+compresser.o

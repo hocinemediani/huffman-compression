@@ -6,7 +6,7 @@ package THCharCode is
 
    type entryNodePointer2 is access entryNode2;
 
-   type nodeArray2 is array (1 .. 128) of entryNodePointer2;
+   type nodeArray2 is array (1 .. 256) of entryNodePointer2;
 
    type entryNode2 is record
       key : Unbounded_String;
@@ -44,7 +44,7 @@ package THCharCode is
 
 
    -- Hash a key.
-   function Hash2 (Key : in String) return Integer;
+   function HashKey2 (Key : in String) return Integer;
 
 
    -- Registers a new value associated to a key or update it.

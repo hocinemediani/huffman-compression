@@ -13,7 +13,7 @@ package body TH is
    begin
       HashTable.size := 0;
       HashTable.length := Length;
-      for i in 0 .. (HashTable.length - 1) loop
+      for i in 1 .. HashTable.length loop
          HashTable.entryNodeArray (i) := null;
       end loop;
    end InitialiseHashTable;
@@ -25,7 +25,7 @@ package body TH is
 
    begin
       -- Exploring the nodes.
-      for i in 0 .. (HashTable.length - 1) loop
+      for i in 1 .. HashTable.length loop
          current := HashTable.entryNodeArray (i);
          if current /= null then
             while current /= null loop
@@ -55,25 +55,25 @@ package body TH is
    end GetSize;
 
 
-   function Hash (Key : in String) return Integer is
+   function HashKey (Key : in String) return Integer is
 
    result : Integer := 0;
 
    begin
       for i in 1 .. 8 loop
-         if Integer'Value (Key (i)'Image) = 1 then
+         if Key (i) = '1' then
             result := result + 2 ** (8 - i);
          end if;
       end loop;
 
       return result;
-   end Hash;
+   end HashKey;
 
 
    procedure Register (HashTable : in out hashMap; Key : in String; Value : in Integer) is
 
    current, previous, firstNode : entryNodePointer;
-   hashedKey : CONSTANT Integer := Hash (Key);
+   hashedKey : CONSTANT Integer := HashKey (Key);
 
    begin
       current := HashTable.entryNodeArray (hashedKey);
@@ -103,7 +103,7 @@ package body TH is
    procedure Delete (HashTable : in out hashMap; Key : in String) is
 
    previous, current : entryNodePointer;
-   hashedKey : CONSTANT Integer := Hash (Key);
+   hashedKey : CONSTANT Integer := HashKey (Key);
 
    begin
       current := HashTable.entryNodeArray (hashedKey);
@@ -132,7 +132,7 @@ package body TH is
    function IsIn (HashTable : in hashMap; Key : in String) return Boolean is
     
    current : entryNodePointer;
-   hashedKey : CONSTANT Integer := Hash (Key);
+   hashedKey : CONSTANT Integer := HashKey (Key);
     
    begin
       current := HashTable.EntryNodeArray (hashedKey);
@@ -149,7 +149,7 @@ package body TH is
    function ValueOf (HashTable : in hashMap; Key : in String) return Integer is
 
    current : entryNodePointer;
-   hashedKey : CONSTANT Integer := Hash (Key);
+   hashedKey : CONSTANT Integer := HashKey (Key);
 
    begin
       current := HashTable.entryNodeArray (hashedKey);
@@ -174,7 +174,7 @@ package body TH is
    current : entryNodePointer;
         
    begin
-      for i in 0 .. (HashTable.length - 1) loop
+      for i in 1 .. HashTable.length loop
          current := HashTable.entryNodeArray (i);
          Put (i, 1); Put (" : ");
          if current /= null then
@@ -195,7 +195,7 @@ package body TH is
    current : entryNodePointer;
 
    begin
-      for i in 0 .. (HashTable.length - 1) loop
+      for i in 1 .. HashTable.length loop
          current := HashTable.entryNodeArray (i);
          while current /= null loop
             begin

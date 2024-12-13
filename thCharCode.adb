@@ -13,7 +13,7 @@ package body THCharCode is
    begin
       HashTable.size := 0;
       HashTable.length := Length;
-      for i in 0 .. (HashTable.length - 1) loop
+      for i in 1 .. HashTable.length loop
          HashTable.entryNodeArray (i) := null;
       end loop;
    end InitialiseHashTable2;
@@ -25,7 +25,7 @@ package body THCharCode is
 
    begin
       -- Exploring the nodes.
-      for i in 0 .. (HashTable.length - 1) loop
+      for i in 1 .. HashTable.length loop
          current := HashTable.entryNodeArray (i);
          if current /= null then
             while current /= null loop
@@ -55,25 +55,25 @@ package body THCharCode is
    end GetSize2;
 
 
-   function Hash2 (Key : in String) return Integer is  
+   function HashKey2 (Key : in String) return Integer is  
 
    result : Integer := 0;
 
    begin
       for i in 1 .. 8 loop
-         if Integer'Value (Key (i)'Image) = 1 then
+         if Key (i) = '1' then
             result := result + 2 ** (8 - i);
          end if;
       end loop;
 
       return result;
-   end Hash2;
+   end HashKey2;
 
 
    procedure Register2 (HashTable : in out hashMap2; Key : in Unbounded_String; Value : in Unbounded_String) is
 
    current, previous, firstNode : entryNodePointer2;
-   hashedKey : CONSTANT Integer := Hash2 (To_String (Key));
+   hashedKey : CONSTANT Integer := HashKey2 (To_String (Key));
 
    begin
       current := HashTable.entryNodeArray (hashedKey);
@@ -103,7 +103,7 @@ package body THCharCode is
    procedure Delete2 (HashTable : in out hashMap2; Key : in Unbounded_String) is
 
    previous, current : entryNodePointer2;
-   hashedKey : CONSTANT Integer := Hash2 (To_String (Key));
+   hashedKey : CONSTANT Integer := HashKey2 (To_String (Key));
 
    begin
       current := HashTable.entryNodeArray (hashedKey);
@@ -132,7 +132,7 @@ package body THCharCode is
    function IsIn2 (HashTable : in hashMap2; Key : in Unbounded_String) return Boolean is
     
    current : entryNodePointer2;
-   hashedKey : CONSTANT Integer := Hash2 (To_String (Key));
+   hashedKey : CONSTANT Integer := HashKey2 (To_String (Key));
     
    begin
       current := HashTable.entryNodeArray (hashedKey);
@@ -149,7 +149,7 @@ package body THCharCode is
    function ValueOf2 (HashTable : in hashMap2; Key : in Unbounded_String) return Unbounded_String is
 
    current : entryNodePointer2;
-   hashedKey : CONSTANT Integer := Hash2 (To_String (Key));
+   hashedKey : CONSTANT Integer := HashKey2 (To_String (Key));
 
    begin
       current := HashTable.entryNodeArray (hashedKey);
@@ -174,7 +174,7 @@ package body THCharCode is
    current : entryNodePointer2;
         
    begin
-      for i in 0 .. (HashTable.length - 1) loop
+      for i in 1 .. HashTable.length loop
          current := HashTable.entryNodeArray (i);
          Put (i, 1); Put (" : ");
          if current /= null then
@@ -195,7 +195,7 @@ package body THCharCode is
    current : entryNodePointer2;
 
    begin
-      for i in 0 .. (HashTable.length - 1) loop
+      for i in 1 .. HashTable.length loop
          current := HashTable.entryNodeArray (i);
          while current /= null loop
             begin
