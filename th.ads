@@ -1,7 +1,5 @@
 package TH is
 
-   type characterByte is mod 2**8;
-
    type entryNode;
 
    type entryNodePointer is access entryNode;
