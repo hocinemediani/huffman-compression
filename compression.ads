@@ -69,7 +69,7 @@ package COMPRESSION is
 
 
 	-- Create the file with the symbols, the tree structure and the encoded text.
-	procedure CreateFile (storageTree : in treeQueue; symbolsHashTable : in hashMap; binaryTree : in treeNodePointer; encodedSymbols : in hashMap2; encodedFile : out File_Type; infixTree : in out Unbounded_String) with
+	procedure CreateFile (fileName : in Unbounded_String; storageTree : in treeQueue; symbolsHashTable : in hashMap; binaryTree : in treeNodePointer; encodedSymbols : in hashMap2; encodedFile : out File_Type; infixTree : in out Unbounded_String) with
          Pre => encodedSymbols.size > 0,
          Post => not End_Of_File (encodedFile);
 

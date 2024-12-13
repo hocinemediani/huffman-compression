@@ -192,13 +192,15 @@ package body COMPRESSION is
    end EncodeText;
 
 
-   procedure CreateFile (storageTree : in treeQueue; symbolsHashTable : in hashMap; binaryTree : in treeNodePointer; encodedSymbols : in hashMap2; encodedFile : out File_Type; infixTree : in out Unbounded_String) is
+   procedure CreateFile (fileName : in Unbounded_String; storageTree : in treeQueue; symbolsHashTable : in hashMap; binaryTree : in treeNodePointer; encodedSymbols : in hashMap2; encodedFile : out File_Type; infixTree : in out Unbounded_String) is
 
    inputFile : File_Type;
 
    begin
-      Create (encodedFile, Out_File, "output.txt.hff");
+      Create (encodedFile, Out_File, To_String (fileName));
       PutSymbols (encodedSymbols, encodedFile);
+      InfixBrowsing (storageTree, symbolsHashTable, binaryTree, infixTree);
+      Put (encodedFile, To_String (infixTree));
       EncodeText (inputFile, encodedFile, encodedSymbols);
    end CreateFile;
 
@@ -226,6 +228,7 @@ package body COMPRESSION is
    encodedSymbols : hashMap2;
    encodedFile : File_Type;
    infixTree : Unbounded_String;
+   fileName : Unbounded_String;
 
 procedure MainProcedure is
    begin
@@ -233,10 +236,13 @@ procedure MainProcedure is
          Put ("compresser ne prends qu'un argument (le texte.txt)");
          return;
       end if;
+
+      fileName := To_Unbounded_String (Argument (1)) & ".hff";
+
       GetSymbols (textToCompress, symbolsHashTable);
       BuildHuffmanTree (symbolsHashTable, binaryTree);
       GetTextCode (binaryTree, encodedSymbols);
-      CreateFile (storageTree, symbolsHashTable, binaryTree, encodedSymbols, encodedFile, infixTree);
+      CreateFile (fileName, storageTree, symbolsHashTable, binaryTree, encodedSymbols, encodedFile, infixTree);
       DestroyEverything (symbolsHashTable, encodedSymbols, storageTree.storageArray);
 
    end MainProcedure;

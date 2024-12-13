@@ -42,7 +42,7 @@ procedure COMPRESSION_TEST is
    HuffmanCode : CONSTANT array (1 .. arrayLength) of Unbounded_String
       := (+"000", +"001", +"010", +"0110", +"0111", +"1000", +"1001", +"1010", +"10110", +"10111", +"110", +"111"); 
    
-   InfixHuffmanTree : CONSTANT Unbounded_String := (+"00011010110001101011011");
+   InfixHuffmanTree : CONSTANT Unbounded_String := (+"00011000111100011011011");
 
    procedure TestGetSymbols is
    begin
