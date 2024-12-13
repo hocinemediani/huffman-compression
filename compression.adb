@@ -72,6 +72,7 @@ package body COMPRESSION is
    
    current : Integer := 1;
    storageTree : treeQueue;
+   newNode : treeNodePointer;
    
    begin
       storageTree.realSize := 0;
@@ -81,12 +82,9 @@ package body COMPRESSION is
       end loop;
       for i in 1 .. hashTableSize loop
          if symbolsHashTable.entryNodeArray (i) /= null then
-            declare
-               newNode : CONSTANT treeNodePointer := new treeNode' (symbolsHashTable.entryNodeArray (i).key, symbolsHashTable.entryNodeArray (i).value, null, null, null, False);
-            begin
+               newNode := new treeNode' (symbolsHashTable.entryNodeArray (i).key, symbolsHashTable.entryNodeArray (i).value, null, null, null, False);
                storageTree.storageArray (current) := newNode;
                current := current + 1;
-            end;
          end if;
       end loop;
       storageTree.realSize := current - 1;
@@ -164,6 +162,7 @@ package body COMPRESSION is
             it := it + 1;
             PutSymbols (symbolsHashTable, it, current.symbol, encodedFile);
             InfixBrowsing (it, storageTree, symbolsHashTable, current.parent, infixTree, encodedFile);
+            Free3 (current);
          end if;
       end if;
    end InfixBrowsing;
@@ -234,7 +233,6 @@ package body COMPRESSION is
    mode : Boolean := True;
 
 procedure MainProcedure is
-
    begin
       if Argument_Count = 1 then
          fileName := To_Unbounded_String (Argument (1)) & ".hff";
@@ -261,7 +259,6 @@ procedure MainProcedure is
          DisplayHuffmanTree (binaryTree, storageTree.storageArray);
       end if;
       DestroyEverything (symbolsHashTable, encodedSymbols, storageTree.storageArray);
-
    end MainProcedure;
 
 end COMPRESSION;
