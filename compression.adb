@@ -230,6 +230,7 @@ package body COMPRESSION is
       Create (encodedFile, Out_File, To_String (fileName));
       if modeBavard then
          InfixBrowsingBavard (it, storageTree, symbolsHashTable, binaryTree, infixTree, encodedFile);
+         DisplayHashTable2 (encodedSymbols);
       else 
          InfixBrowsing (it, storageTree, symbolsHashTable, binaryTree, infixTree, encodedFile);
       end if;

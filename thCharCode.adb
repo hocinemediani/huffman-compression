@@ -1,5 +1,4 @@
 with Ada.Text_IO;            use Ada.Text_IO;
-with Ada.Integer_Text_IO;    use Ada.Integer_Text_IO;
 with SDA_Exceptions;         use SDA_Exceptions;
 with Ada.Unchecked_Deallocation;
 
@@ -163,12 +162,6 @@ package body THCharCode is
    end ValueOf2;
 
 
-   procedure Display2 (Key : in Unbounded_String; Value : in Unbounded_String) is
-   begin
-      Put("-->["); Put ('"'); Put (To_String (Key)); Put ('"'); Put (" : "); Put (To_String (Value)); Put("]");
-   end Display2;
-
-
    procedure DisplayHashTable2 (HashTable : in hashMap2) is
 
    current : entryNodePointer2;
@@ -176,15 +169,19 @@ package body THCharCode is
    begin
       for i in 1 .. HashTable.length loop
          current := HashTable.entryNodeArray (i);
-         Put (i, 1); Put (" : ");
          if current /= null then
-            Display2 (HashTable.entryNodeArray (i).key, HashTable.entryNodeArray (i).value);
+            if i = 255 then
+               Put ("'"); Put ("\$"); Put("'"); Put (" --> ");
+            else
+               Put ("'"); Put (Character'Val (i)); Put("'"); Put ("  --> ");
+            end if;
+            Put (To_String (HashTable.entryNodeArray (i).value));
             while current.next /= null loop
-               Display2 (current.next.key, current.next.value);
+            Put (To_String  (current.next.value));
                current := current.next;
             end loop;
+            New_Line;
          end if;
-         Put_Line("--E");
       end loop;
       New_Line;
    end DisplayHashTable2;

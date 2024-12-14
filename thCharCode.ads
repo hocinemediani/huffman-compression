@@ -68,10 +68,6 @@ package THCharCode is
    function ValueOf2 (HashTable : in hashMap2; Key : in Unbounded_String) return Unbounded_String;
 
 
-   -- Display a node.
-   procedure Display2 (Key : in Unbounded_String; Value : in Unbounded_String);
-
-
    -- Display the hash map.
    procedure DisplayHashTable2 (HashTable : in hashMap2);
 
