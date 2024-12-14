@@ -265,7 +265,6 @@ procedure MainProcedure is
    begin
       if Argument_Count = 1 then
          fileName := To_Unbounded_String (Argument (1)) & ".hff";
-         Put_Line ("Mode bavard");
       elsif Argument_Count = 0 then
          Put_Line ("Compresser prend en parametre au moins un argument (dans ce cas la, le nom de fichier avec son extension)");
          return;
@@ -273,10 +272,8 @@ procedure MainProcedure is
          fileName := To_Unbounded_String (Argument (Argument_Count)) & ".hff";
          if Argument (Argument_Count - 1) = "-s" then
             modeBavard := False;
-            Put_Line ("Mode Silencieux");
          else 
             modeBavard := True;
-            Put_Line ("Mode Bavard");
          end if;
       end if;
 

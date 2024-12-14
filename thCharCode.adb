@@ -183,7 +183,6 @@ package body THCharCode is
             New_Line;
          end if;
       end loop;
-      New_Line;
    end DisplayHashTable2;
 
 
