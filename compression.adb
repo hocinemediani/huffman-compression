@@ -263,17 +263,13 @@ package body COMPRESSION is
 
 procedure MainProcedure is
    begin
-      if Argument_Count = 1 then
-         fileName := To_Unbounded_String (Argument (1)) & ".hff";
-      elsif Argument_Count = 0 then
+      if Argument_Count = 0 then
          Put_Line ("Compresser prend en parametre au moins un argument (dans ce cas la, le nom de fichier avec son extension)");
          return;
-      elsif Argument_Count > 1 then
+      else
          fileName := To_Unbounded_String (Argument (Argument_Count)) & ".hff";
          if Argument (Argument_Count - 1) = "-s" then
             modeBavard := False;
-         else 
-            modeBavard := True;
          end if;
       end if;
 
