@@ -168,34 +168,77 @@ package body COMPRESSION is
    end InfixBrowsing;
 
 
-   procedure InfixBrowsingBavard (it : in out Integer; storageTree : in treeQueue; symbolsHashTable : in hashMap; binaryTree : in treeNodePointer; infixTree : out Unbounded_String; encodedFile : in out File_Type) is
-   
+   procedure DisplayTree(it : in out Integer; storageTree : in treeQueue; symbolsHashTable : in hashMap; binaryTree : in treeNodePointer; depth : in out Integer; leftOrRight : in out Boolean) is
+  
    current : treeNodePointer;
    
    begin
-      if it < symbolsHashTable.size then
-         current := binaryTree;
-         if current.leftChild /= null then
-            if current.leftChild.isSeen and current.rightChild.isSeen then
-               current.isSeen := True;
-               InfixBrowsingBavard (it, storageTree, symbolsHashTable, current.parent, infixTree, encodedFile);
-            elsif current.leftChild.isSeen then
-               InfixBrowsingBavard (it, storageTree, symbolsHashTable, current.rightChild, infixTree, encodedFile);
-            else
-               infixTree := infixTree & To_Unbounded_String ("0");
-               current := current.leftChild;
-               InfixBrowsingBavard (it, storageTree, symbolsHashTable, current, infixTree, encodedFile);
-            end if;
-         else
+  	if it < symbolsHashTable.size then
+      current := binaryTree;
+     	if current.leftChild /= null then -- on est pas sur une feuille
+        	if current.leftChild.isSeen and current.rightChild.isSeen then -- les deux fils sont vus on remonte
             current.isSeen := True;
-            infixTree := infixTree & To_Unbounded_String ("1");
-            it := it + 1;
-            PutSymbols (symbolsHashTable, it, current.symbol, encodedFile);
-            InfixBrowsingBavard (it, storageTree, symbolsHashTable, current.parent, infixTree, encodedFile);
-            Free3 (current);
-         end if;
-      end if;
-   end InfixBrowsingBavard;
+            depth := depth - 1;
+            DisplayTree (it, storageTree, symbolsHashTable, current.parent, depth, leftOrRight);
+        	elsif current.parent = null and current.leftChild.isSeen then
+           	New_Line;
+           	Put("   ");
+           	Put("\--1--(" & Integer'Image(current.rightChild.occurrences) & " )");
+           	current := current.rightChild; -- on va a gauche car parcours infixe
+           	leftOrRight := True;
+           	current.isSeen := True;
+           	depth := depth + 1;
+           	DisplayTree(it, storageTree, symbolsHashTable, current, depth, leftOrRight);
+        	elsif current.leftChild.isSeen then  -- gauche vue et non null on va a droite
+            New_Line;
+            Put("   ");
+            if depth >= 1 then
+               for i in 0 .. depth - 1 loop
+                  Put("|       ");
+               end loop;
+               Put("\--1--(" & Integer'Image(current.rightChild.occurrences) & " )");
+            end if;
+            depth := depth + 1;
+            current := current.rightChild;
+            leftOrRight := True;   	 
+            DisplayTree(it, storageTree, symbolsHashTable, current, depth, leftOrRight);
+	      elsif current.parent = null and not current.leftChild.isSeen and not current.RightChild.isSeen then -- on est a la racine au debut
+           	Put("(" & Integer'Image(current.occurrences) & " )");
+           	New_Line;
+           	Put("   ");
+           	Put("\--0--(" & Integer'Image(current.leftChild.occurrences) & " )");
+           	current := current.leftChild; -- on va a gauche car parcours infixe
+           	leftOrRight := False;
+           	depth := depth + 1;
+           	current.isSeen := True;
+           	DisplayTree(it, storageTree, symbolsHashTable, current, depth, leftOrRight);
+        	else -- on est sur un noeud ou le gauche n'est pas vue
+           	New_Line;
+           	Put("   ");
+           	if depth >= 1 then
+               for i in 0 .. depth -1 loop
+                  Put("|      ");
+               end loop;
+           	end if;
+           	Put("\--0--(" & Integer'Image(current.leftChild.occurrences) & " )");
+           	depth := depth + 1;
+           	leftOrRight := False;
+           	DisplayTree (it, storageTree, symbolsHashTable, current.leftChild, depth, leftOrRight);
+        	end if;
+     	else --feuille
+        	current.isSeen := True;
+        	it := it + 1;
+        	if leftOrRight then
+            Put(" '" & Character'Val(HashKey(current.symbol)) & "'");
+        	else
+            Put(" '" & Character'Val(HashKey(current.symbol)) & "'");
+        	end if;
+        	depth := depth - 1;
+        	DisplayTree (it, storageTree, symbolsHashTable, current.parent, depth, leftOrRight);
+        	Free3(Current);
+     	end if;
+  	end if;
+   end DisplayTree;
 
 
    procedure EncodeText (textToCompress : in out File_Type; encodedFile : in out File_Type; encodedSymbols : in hashMap2) is
@@ -225,14 +268,15 @@ package body COMPRESSION is
 
    inputFile : File_Type;
    it : Integer := 0;
+   depth : Integer := 0;
+   leftOrRight : Boolean := False;
 
    begin
       Create (encodedFile, Out_File, To_String (fileName));
+      InfixBrowsing (it, storageTree, symbolsHashTable, binaryTree, infixTree, encodedFile);
       if modeBavard then
-         InfixBrowsingBavard (it, storageTree, symbolsHashTable, binaryTree, infixTree, encodedFile);
+         DisplayTree (it, storageTree, symbolsHashTable, binaryTree, depth, leftOrRight);
          DisplayHashTable2 (encodedSymbols);
-      else 
-         InfixBrowsing (it, storageTree, symbolsHashTable, binaryTree, infixTree, encodedFile);
       end if;
       Put (encodedFile, To_String (infixTree));
       EncodeText (inputFile, encodedFile, encodedSymbols);
@@ -268,8 +312,10 @@ procedure MainProcedure is
          return;
       else
          fileName := To_Unbounded_String (Argument (Argument_Count)) & ".hff";
-         if Argument (Argument_Count - 1) = "-s" then
-            modeBavard := False;
+         if Argument_Count > 1 then
+            if Argument (Argument_Count - 1) = "-s" then
+               modeBavard := False;
+            end if;
          end if;
       end if;
 
