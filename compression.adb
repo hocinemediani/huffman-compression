@@ -192,8 +192,9 @@ package body COMPRESSION is
         	elsif current.leftChild.isSeen then  -- gauche vue et non null on va a droite
             New_Line;
             Put("   ");
+            Put("|");
             for i in 0 .. depth - 1 loop
-               Put("|      ");
+               Put("      ");
             end loop;
             Put("\--1--(" & Integer'Image(current.rightChild.occurrences) & " )");
             depth := depth + 1;
@@ -213,8 +214,9 @@ package body COMPRESSION is
         	else -- on est sur un noeud ou le gauche n'est pas vue
            	New_Line;
            	Put("   ");
+            Put("|");
             for i in 0 .. depth - 1 loop
-               Put("|      ");
+               Put("      ");
             end loop;
            	Put("\--0--(" & Integer'Image(current.leftChild.occurrences) & " )");
            	depth := depth + 1;
