@@ -77,7 +77,7 @@ package COMPRESSION is
       -- We first need to put in the file every symbols used, sorted by number of occurences.
       procedure PutSymbols (symbolsHashTable : in hashMap; it : in Integer; symbol : in String; encodedFile : in out File_Type);
       -- Then we need to find the tree structure by infixed browsing of the tree and put it next to the characters used.
-      procedure InfixBrowsing (it : in out Integer; storageTree : in treeQueue; symbolsHashTable : in hashMap; binaryTree : in treeNodePointer; infixTree : out Unbounded_String; encodedFile : in out File_Type);
+      procedure InfixBrowsing (it : in out Integer; symbolsHashTable : in hashMap; binaryTree : in treeNodePointer; infixTree : out Unbounded_String; encodedFile : in out File_Type);
 
       procedure DisplayTree (it : in out Integer; storageTree : in treeQueue; symbolsHashTable : in hashMap; binaryTree : in treeNodePointer; depth : in out Integer; LeftOrRight : in out Boolean);
       -- And finally we need to encode the text.

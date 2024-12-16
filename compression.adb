@@ -138,7 +138,7 @@ package body COMPRESSION is
    end PutSymbols;
 
 
-   procedure InfixBrowsing (it : in out Integer; storageTree : in treeQueue; symbolsHashTable : in hashMap; binaryTree : in treeNodePointer; infixTree : out Unbounded_String; encodedFile : in out File_Type) is
+   procedure InfixBrowsing (it : in out Integer; symbolsHashTable : in hashMap; binaryTree : in treeNodePointer; infixTree : out Unbounded_String; encodedFile : in out File_Type) is
    
    current : treeNodePointer;
    
@@ -148,20 +148,20 @@ package body COMPRESSION is
          if current.leftChild /= null then
             if current.leftChild.isSeen and current.rightChild.isSeen then
                current.isSeen := True;
-               InfixBrowsing (it, storageTree, symbolsHashTable, current.parent, infixTree, encodedFile);
+               InfixBrowsing (it, symbolsHashTable, current.parent, infixTree, encodedFile);
             elsif current.leftChild.isSeen then
-               InfixBrowsing (it, storageTree, symbolsHashTable, current.rightChild, infixTree, encodedFile);
+               InfixBrowsing (it, symbolsHashTable, current.rightChild, infixTree, encodedFile);
             else
                infixTree := infixTree & To_Unbounded_String ("0");
                current := current.leftChild;
-               InfixBrowsing (it, storageTree, symbolsHashTable, current, infixTree, encodedFile);
+               InfixBrowsing (it, symbolsHashTable, current, infixTree, encodedFile);
             end if;
          else
             current.isSeen := True;
             infixTree := infixTree & To_Unbounded_String ("1");
             it := it + 1;
             PutSymbols (symbolsHashTable, it, current.symbol, encodedFile);
-            InfixBrowsing (it, storageTree, symbolsHashTable, current.parent, infixTree, encodedFile);
+            InfixBrowsing (it, symbolsHashTable, current.parent, infixTree, encodedFile);
             Free3 (current);
          end if;
       end if;
@@ -266,21 +266,23 @@ package body COMPRESSION is
 
    inputFile : File_Type;
    it : Integer := 0;
+   it2 : Integer := 0;
    depth : Integer := 0;
    leftOrRight : Boolean := False;
 
    begin
       Create (encodedFile, Out_File, To_String (fileName));
-      InfixBrowsing (it, storageTree, symbolsHashTable, binaryTree, infixTree, encodedFile);
+      InfixBrowsing (it, symbolsHashTable, binaryTree, infixTree, encodedFile);
+      Put (encodedFile, To_String (infixTree));
+      EncodeText (inputFile, encodedFile, encodedSymbols);
       if modeBavard then
-         DisplayTree (it, storageTree, symbolsHashTable, binaryTree, depth, leftOrRight);
+         DisplayTree (it2, storageTree, symbolsHashTable, binaryTree, depth, leftOrRight);
          New_Line;
          New_Line;
          New_Line;
          DisplayHashTable2 (encodedSymbols);
       end if;
-      Put (encodedFile, To_String (infixTree));
-      EncodeText (inputFile, encodedFile, encodedSymbols);
+      
    end CreateFile;
 
 
