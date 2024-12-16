@@ -192,12 +192,10 @@ package body COMPRESSION is
         	elsif current.leftChild.isSeen then  -- gauche vue et non null on va a droite
             New_Line;
             Put("   ");
-            if depth >= 1 then
-               for i in 0 .. depth - 1 loop
-                  Put("|       ");
-               end loop;
-               Put("\--1--(" & Integer'Image(current.rightChild.occurrences) & " )");
-            end if;
+            for i in 0 .. depth - 1 loop
+               Put("|      ");
+            end loop;
+            Put("\--1--(" & Integer'Image(current.rightChild.occurrences) & " )");
             depth := depth + 1;
             current := current.rightChild;
             leftOrRight := True;   	 
@@ -215,11 +213,9 @@ package body COMPRESSION is
         	else -- on est sur un noeud ou le gauche n'est pas vue
            	New_Line;
            	Put("   ");
-           	if depth >= 1 then
-               for i in 0 .. depth -1 loop
-                  Put("|      ");
-               end loop;
-           	end if;
+            for i in 0 .. depth - 1 loop
+               Put("|      ");
+            end loop;
            	Put("\--0--(" & Integer'Image(current.leftChild.occurrences) & " )");
            	depth := depth + 1;
            	leftOrRight := False;
@@ -228,11 +224,11 @@ package body COMPRESSION is
      	else --feuille
         	current.isSeen := True;
         	it := it + 1;
-        	if leftOrRight then
+         if current.occurrences /= 0 then
             Put(" '" & Character'Val(HashKey(current.symbol)) & "'");
-        	else
-            Put(" '" & Character'Val(HashKey(current.symbol)) & "'");
-        	end if;
+         else 
+            Put(" '\$'");
+         end if;
         	depth := depth - 1;
         	DisplayTree (it, storageTree, symbolsHashTable, current.parent, depth, leftOrRight);
         	Free3(Current);
@@ -276,6 +272,9 @@ package body COMPRESSION is
       InfixBrowsing (it, storageTree, symbolsHashTable, binaryTree, infixTree, encodedFile);
       if modeBavard then
          DisplayTree (it, storageTree, symbolsHashTable, binaryTree, depth, leftOrRight);
+         New_Line;
+         New_Line;
+         New_Line;
          DisplayHashTable2 (encodedSymbols);
       end if;
       Put (encodedFile, To_String (infixTree));
