@@ -169,10 +169,10 @@ package body COMPRESSION is
    current : treeNodePointer;
 
    begin
-      if binaryTree /= null then
-         current := binaryTree;
+      current := binaryTree;
+      if current /= null then
          for i in 1 .. depth - 1 loop
-               Put ("  |     ");
+            Put ("  |    ");
          end loop;
          if current.parent /= null and then current.parent.leftChild = current then
             Put ("  \--0--");
@@ -180,7 +180,7 @@ package body COMPRESSION is
             Put ("  \--1--");
          end if;
          Put ("("); Put (current.occurrences, 1); Put (")");
-         if current.leftChild = null and current.rightChild = null then
+         if current.leftChild = null then
             Put (" '");
             if HashKey (current.symbol) = 255 then
                Put ("\$");
@@ -191,14 +191,8 @@ package body COMPRESSION is
             it := it + 1;
          else
             New_Line;
-         end if;
-         if current.leftChild /= null then
             depth := depth + 1;
             DisplayTree (depth, it, symbolsHashTable, current.leftChild, infixTree, encodedFile);
-            depth := depth - 1;
-         end if;
-         if current.rightChild /= null then
-            depth := depth + 1;
             DisplayTree (depth, it, symbolsHashTable, current.rightChild, infixTree, encodedFile);
             depth := depth - 1;
          end if;
