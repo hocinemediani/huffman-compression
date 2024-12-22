@@ -164,7 +164,7 @@ package body COMPRESSION is
    end InfixBrowsing;
 
 
-   procedure InfixBrowsingBavard (it : in out Integer; symbolsHashTable : in hashMap; binaryTree : in treeNodePointer; infixTree : out Unbounded_String; encodedFile : in out File_Type) is
+   procedure InfixBrowsingBavard (depth : in out Integer; it : in out Integer; symbolsHashTable : in hashMap; binaryTree : in treeNodePointer; infixTree : out Unbounded_String; encodedFile : in out File_Type) is
    
    current : treeNodePointer;
    
@@ -175,9 +175,15 @@ package body COMPRESSION is
             if current.leftChild.isSeen and current.rightChild.isSeen then
                current.isSeen := True;
                current := current.parent;
+               depth := depth - 1;
             elsif current.leftChild.isSeen then
                current := current.rightChild;
             else
+               Put ("("); Put (current.occurrences, 1); Put_Line (")");
+               for k in 1 .. depth - 1 loop
+                  Put ("  |     ");
+               end loop;
+               depth := depth + 1;
                infixTree := infixTree & To_Unbounded_String ("0");
                current := current.leftChild;
             end if;
@@ -185,10 +191,25 @@ package body COMPRESSION is
             current.isSeen := True;
             infixTree := infixTree & To_Unbounded_String ("1");
             it := it + 1;
+            -- Displaying the symbol and its occurences (ex : (3) 'a').
+               Put ("("); Put (current.occurrences, 1); Put (")"); Put (" '"); 
+               if HashKey (current.symbol) = 255 then
+                  Put ("\$");
+               else
+                  Put (Character'Val (HashKey (current.symbol)));
+               end if;
+               Put_Line ("'");
             PutSymbols (symbolsHashTable, it, current.symbol, encodedFile);
             current := current.parent;
          end if;
-         InfixBrowsingBavard (it, symbolsHashTable, current, infixTree, encodedFile);
+         if current.parent /= null then
+            if current.parent.leftChild = current then
+               Put("  \--0--");
+            elsif current.parent.rightChild = current then
+               Put("  \--1--");
+            end if;
+         end if;
+         InfixBrowsingBavard (depth, it, symbolsHashTable, current, infixTree, encodedFile);
       end if;
    end InfixBrowsingBavard;
 
@@ -216,27 +237,25 @@ package body COMPRESSION is
    end EncodeText;
 
 
-   procedure CreateFile (modeBavard : in Boolean; fileName : in Unbounded_String; storageTree : in treeQueue; symbolsHashTable : in hashMap; binaryTree : in treeNodePointer; encodedSymbols : in hashMap2; encodedFile : out File_Type; infixTree : in out Unbounded_String) is
+   procedure CreateFile (modeBavard : in Boolean; fileName : in Unbounded_String; symbolsHashTable : in hashMap; binaryTree : in treeNodePointer; encodedSymbols : in hashMap2; encodedFile : out File_Type; infixTree : in out Unbounded_String) is
 
    inputFile : File_Type;
    it : Integer := 0;
-   it2 : Integer := 0;
    depth : Integer := 0;
-   leftSide : Boolean := True;
 
    begin
       Create (encodedFile, Out_File, To_String (fileName));
-      InfixBrowsingBavard (it, symbolsHashTable, binaryTree, infixTree, encodedFile);
-      Put (encodedFile, To_String (infixTree));
-      EncodeText (inputFile, encodedFile, encodedSymbols);
       if modeBavard then
-         DisplayHashTable2 (encodedSymbols);
+         InfixBrowsingBavard (depth, it, symbolsHashTable, binaryTree, infixTree, encodedFile);
          for i in 1 .. 3 loop
             New_Line;
          end loop;
-         -- DisplayTree2 (it2, storageTree, symbolsHashTable, binaryTree, depth, leftSide);
+         DisplayHashTable2 (encodedSymbols);
+      else
+         InfixBrowsing (it, symbolsHashTable, binaryTree, infixTree, encodedFile);
       end if;
-      
+      Put (encodedFile, To_String (infixTree));
+      EncodeText (inputFile, encodedFile, encodedSymbols);
    end CreateFile;
 
 
@@ -279,7 +298,7 @@ procedure MainProcedure is
       GetSymbols (textToCompress, symbolsHashTable);
       BuildHuffmanTree (symbolsHashTable, binaryTree);
       GetTextCode (binaryTree, encodedSymbols);
-      CreateFile (modeBavard, fileName, storageTree, symbolsHashTable, binaryTree, encodedSymbols, encodedFile, infixTree);
+      CreateFile (modeBavard, fileName, symbolsHashTable, binaryTree, encodedSymbols, encodedFile, infixTree);
       DestroyEverything (symbolsHashTable, encodedSymbols, storageTree.storageArray);
    end MainProcedure;
 
