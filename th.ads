@@ -62,7 +62,7 @@ package TH is
    function IsIn (HashTable : in hashMap; Key : in String) return Boolean;
 
 
-   -- Get the value associated to a key with the exception Cle_Absente_Exception.
+   -- Get the value associated to a key. Returns 0 if the value isn't in.
    function ValueOf (HashTable : in hashMap; Key : in String) return Integer;
 
 

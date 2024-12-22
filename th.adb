@@ -1,6 +1,5 @@
 with Ada.Text_IO;            use Ada.Text_IO;
 with Ada.Integer_Text_IO;    use Ada.Integer_Text_IO;
-with SDA_Exceptions;         use SDA_Exceptions;
 with Ada.Unchecked_Deallocation;
 
 package body TH is
@@ -150,16 +149,21 @@ package body TH is
 
    current : entryNodePointer;
    hashedKey : CONSTANT Integer := HashKey (Key);
+   result : Integer;
 
    begin
-      current := HashTable.entryNodeArray (hashedKey);
-      while current /= null loop
-         if current.key = Key then
-            return current.value;
-         end if;
-         current := current.next;
-      end loop;
-      raise Cle_Absente_Exception;
+      if IsIn (HashTable, Key) then
+         current := HashTable.entryNodeArray (hashedKey);
+         while current /= null loop
+            if current.key = Key then
+               result := current.value;
+            end if;
+            current := current.next;
+         end loop;
+      else
+         result := 0;
+      end if;
+      return result;
    end ValueOf;
 
 

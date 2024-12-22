@@ -1,5 +1,4 @@
 with Ada.Text_IO;            use Ada.Text_IO;
-with SDA_Exceptions;         use SDA_Exceptions;
 with Ada.Unchecked_Deallocation;
 
 package body THCharCode is
@@ -149,16 +148,18 @@ package body THCharCode is
 
    current : entryNodePointer2;
    hashedKey : CONSTANT Integer := HashKey2 (To_String (Key));
+   result : Unbounded_String;
 
    begin
+   result := To_Unbounded_String ("");
       current := HashTable.entryNodeArray (hashedKey);
       while current /= null loop
          if current.key = Key then
-            return current.value;
+            result := current.value;
          end if;
          current := current.next;
       end loop;
-      raise Cle_Absente_Exception;
+      return result;
    end ValueOf2;
 
 
