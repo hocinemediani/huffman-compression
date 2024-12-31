@@ -130,7 +130,6 @@ package body COMPRESSION is
       Put (encodedFile, symbol);
       if it = symbolsHashTable.size then
          Put (encodedFile, symbol);
-         New_Line (encodedFile);
       end if;
    end PutSymbols;
 
@@ -208,7 +207,6 @@ package body COMPRESSION is
    
    begin
       Open (textToCompress, In_File, Argument (Argument_Count));
-      New_Line (encodedFile);
       while not End_Of_File (textToCompress) loop
          for i in 1 .. 8 loop
             Get (textToCompress, fileCharacter);
