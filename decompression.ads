@@ -1,7 +1,5 @@
 with Ada.Strings.Unbounded;   use Ada.Strings.Unbounded;
 with Ada.Text_IO;             use Ada.Text_IO;
-with TH;                      use TH;
-with THCharCode;              use THCharCode;
 
 package DECOMPRESSION is
 
@@ -32,9 +30,12 @@ package DECOMPRESSION is
 procedure DecompressionProcedure;
 
 
-procedure ExploreText (encodedFile : in File_Type; fileName : in Unbounded_String; binaryTree : out treeNode);
+procedure ExploreText (encodedFile : in out File_Type; decodedFile : in out File_Type; fileName : in Unbounded_String; symbolsArray : in out StringArray; binaryTree : in treeNodePointer);
 
 
-procedure ReconstructHuffmanTree (encodedFile : in File_Type; binaryTree : out treeNode; infixTree : in out Unbounded_String; previous : treeNodePointer; symbolsArray : in stringArray);
+function ExploreTree (code : in out Unbounded_String; root : in treeNodePointer) return String;
+
+
+procedure ReconstructHuffmanTree (it : in out Integer; encodedFile : in File_Type; binaryTree : in out treeNodePointer; infixTree : in out Unbounded_String; previous : in out treeNodePointer; symbolsArray : in stringArray);
 
 end DECOMPRESSION;

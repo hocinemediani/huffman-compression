@@ -207,7 +207,7 @@ package body COMPRESSION is
    
    begin
       Open (textToCompress, In_File, Argument (Argument_Count));
-      Put (encodedFile, ".");
+      Put (encodedFile, "!");
       while not End_Of_File (textToCompress) loop
          for i in 1 .. 8 loop
             Get (textToCompress, fileCharacter);

@@ -12,3 +12,8 @@ thcharcode.o
 compresser.ali
 compresser.exe
 compresser.o
+decompresser.ali
+decompresser.exe
+decompresser.o
+decompression.ali
+decompression.o
