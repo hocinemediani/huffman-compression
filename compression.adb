@@ -207,14 +207,13 @@ package body COMPRESSION is
    
    begin
       Open (textToCompress, In_File, Argument (Argument_Count));
-      Put (encodedFile, "!");
       while not End_Of_File (textToCompress) loop
          for i in 1 .. 8 loop
             Get (textToCompress, fileCharacter);
             result (i) := fileCharacter (fileCharacter'First);
          end loop;
          hashedKey := HashKey2 (result);
-         Put (encodedFile, To_String (encodedSymbols.entryNodeArray (hashedKey).value)); Put (encodedFile, ".");
+         Put (encodedFile, To_String (encodedSymbols.entryNodeArray (hashedKey).value));
       end loop;
       Put (encodedFile, To_String (encodedSymbols.entryNodeArray (255).value));
       Close (textToCompress);

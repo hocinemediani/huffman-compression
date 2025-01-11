@@ -10,11 +10,13 @@ package body DECOMPRESSION is
    infixTree : Unbounded_String;
    count : Integer := 1;
    encodedString : Unbounded_String;
+   isSymbol : Boolean := True;
 
    begin
       Open (encodedFile, In_File, To_String (fileName));
       while not End_Of_File (encodedFile) loop
-         if previous /= currentResult then
+         -- Récupérer les symboles et leur nombre.
+         while isSymbol loop
             previous := currentResult;
             for i in 1 .. 8 loop
                Get (encodedFile, fileCharacter);
@@ -22,19 +24,16 @@ package body DECOMPRESSION is
             end loop;
             symbolsArray (count) := currentResult;
             count := count + 1;
-         end if;
-         while fileCharacter /= "!" loop
+            -- Stopper lorsque l'on à 2 fois le même byte.
+            if previous = currentResult then
+               isSymbol := False;
+            end if;
+         end loop;
+         -- Récupérer l'arbre infixe en stoppant suivant le nombre de 1.
+         for i in 1 .. count loop
             Get (encodedFile, fileCharacter);
             infixTree := infixTree & fileCharacter;
-         end loop;
-         
-         -- Recuperer les charactères encodés.
-         Get (encodedFile, fileCharacter);
-         if fileCharacter /= "." then
-            encodedString := encodedString & fileCharacter;
-         else
-            Put (decodedFile, ExploreTree (encodedString, binaryTree));
-         end if; 
+         end loop;         
       end loop;
    end ExploreText;
 
