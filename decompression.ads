@@ -33,7 +33,7 @@ procedure DecompressionProcedure;
 procedure ExploreText (encodedFile : in out File_Type; decodedFile : in out File_Type; fileName : in Unbounded_String; symbolsArray : in out StringArray; binaryTree : in treeNodePointer);
 
 
-function ExploreTree (code : in out Unbounded_String; root : in treeNodePointer) return String;
+function ExploreTree (code : in String; root : in treeNodePointer) return treeNodePointer;
 
 
 procedure ReconstructHuffmanTree (it : in out Integer; encodedFile : in File_Type; binaryTree : in out treeNodePointer; infixTree : in out Unbounded_String; previous : in out treeNodePointer; symbolsArray : in stringArray);

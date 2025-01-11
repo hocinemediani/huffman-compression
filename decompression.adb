@@ -11,9 +11,11 @@ package body DECOMPRESSION is
    count : Integer := 1;
    encodedString : Unbounded_String;
    isSymbol : Boolean := True;
+   fileName2 : CONSTANT Unbounded_String := fileName & ".d";
 
    begin
       Open (encodedFile, In_File, To_String (fileName));
+      Open (decodedFile, Out_File, To_String (fileName2));
       while not End_Of_File (encodedFile) loop
          -- Récupérer les symboles et leur nombre.
          while isSymbol loop
@@ -33,24 +35,25 @@ package body DECOMPRESSION is
          for i in 1 .. count loop
             Get (encodedFile, fileCharacter);
             infixTree := infixTree & fileCharacter;
-         end loop;         
+         end loop;
+         -- Parcourir tous les bits du texte et continuer à parcourir si on n'est pas sur une feuille         
+         -- On doit alors changer ExploreTree, et juste prendre en paramètre un pointeur et une instruction
+         -- 0 -> aller à gauche, 1 -> aller à droite. si c'est une feuille on le dit sinon on update juste la position du pointeur
       end loop;
+      ReconstructHuffmanTree (it, encodedFile, binaryTree, infixTree, previousPointer, symbolsArray);
    end ExploreText;
 
 
-   function ExploreTree (code : in out Unbounded_String; root : in treeNodePointer) return String is
-
-   stringCode : CONSTANT String := To_String (code);
-   slicedCode : Unbounded_String := To_Unbounded_String (stringCode (2 .. To_String (code)'Length));
+   function ExploreTree (code : in String; root : in treeNodePointer) return treeNodePointer is
 
    begin
       if root.leftChild = null then
-         return root.symbol;
+         return root;
       end if;
-      if stringCode (1) = '0' then
-         return ExploreTree (slicedCode, root.leftChild);
+      if code = "0" then
+         return root.leftChild;
       else
-         return ExploreTree (slicedCode, root.rightChild);
+         return root.rightChild;
       end if;
    end ExploreTree;
 
