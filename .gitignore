@@ -20,3 +20,6 @@ decompression.o
 text_to_binary.ali
 text_to_binary.exe
 text_to_binary.o
+binary_to_text.o
+binary_to_text.exe
+binary_to_text.ali

@@ -58,7 +58,7 @@ package body DECOMPRESSION is
    end ExploreText;
 
 
-   Procedure ExploreTree  (root : in  treeNodePointer; encodedFile : in out File_Type; decodedFile : in out File_Type ) is
+   procedure ExploreTree (root : in  treeNodePointer; encodedFile : in out File_Type; decodedFile : in out File_Type) is
    
    code : String (1 .. 1);
    
