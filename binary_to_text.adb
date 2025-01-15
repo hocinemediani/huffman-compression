@@ -11,7 +11,7 @@ fileName : Unbounded_String;
 fileCharacter : Character;
 textCharacter : Character;
 asciiCode : Integer := 0;
-tempString : CONSTANT String := Argument (1) (1 .. Argument (1)'Length - 10);
+tempString : CONSTANT String := Argument (1) (1 .. Argument (1)'Length - 16);
 
 begin
    fileName := To_Unbounded_String (tempString) & "TEXT" & ".txt";
