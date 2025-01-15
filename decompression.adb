@@ -1,25 +1,27 @@
-with Ada.Command_Line;           use Ada.Command_Line;
+with Ada.Command_Line;       	use Ada.Command_Line;
 
 package body DECOMPRESSION is
 
-   procedure ExploreText (encodedFile : in out File_Type; decodedFile : in out File_Type; fileName : in Unbounded_String; symbolsArray : in out stringArray; binaryTree : in treeNodePointer) is
+   procedure ExploreText (encodedFile : in out File_Type; decodedFile : in out File_Type; symbolsArray : in out stringArray) is
 
    fileCharacter : String (1 .. 1);
-   previous : String (1 .. 8) := "00000000";
-   currentResult : String (1 .. 8) := "11111111";
+   previousCode : String (1 .. 8) := "00000002";
+   currentResult : String (1 .. 8) := "11111112";
    infixTree : Unbounded_String;
    count : Integer := 1;
-   encodedString : Unbounded_String;
    isSymbol : Boolean := True;
-   fileName2 : CONSTANT Unbounded_String := fileName & ".d";
+   isTree : Boolean := True;
+   isInfix : Boolean := True;
+   currentPointer :TreeNodePointer := new treeNode' ("--------", 0, null, null, null, False);
+   it : Integer := 1;
+   countInfix : Integer := 1;
+
 
    begin
-      Open (encodedFile, In_File, To_String (fileName));
-      Open (decodedFile, Out_File, To_String (fileName2));
       while not End_Of_File (encodedFile) loop
          -- Récupérer les symboles et leur nombre.
          while isSymbol loop
-            previous := currentResult;
+            previousCode := currentResult;
             for i in 1 .. 8 loop
                Get (encodedFile, fileCharacter);
                currentResult (i) := fileCharacter (fileCharacter'First);
@@ -27,77 +29,101 @@ package body DECOMPRESSION is
             symbolsArray (count) := currentResult;
             count := count + 1;
             -- Stopper lorsque l'on à 2 fois le même byte.
-            if previous = currentResult then
+            if previousCode = currentResult then
                isSymbol := False;
             end if;
          end loop;
          -- Récupérer l'arbre infixe en stoppant suivant le nombre de 1.
-         for i in 1 .. count loop
-            Get (encodedFile, fileCharacter);
-            infixTree := infixTree & fileCharacter;
-         end loop;
-         -- Parcourir tous les bits du texte et continuer à parcourir si on n'est pas sur une feuille         
+         if isInfix then   
+            while count > 2 loop
+               Get (encodedFile, fileCharacter);
+               infixTree := infixTree & fileCharacter;
+               if fileCharacter = "1" then
+                  count := count - 1;
+               end if;
+            end loop;
+            isInfix := False;
+         end if;
+         -- Parcourir tous les bits du texte et continuer à parcourir si on n'est pas sur une feuille    	 
          -- On doit alors changer ExploreTree, et juste prendre en paramètre un pointeur et une instruction
          -- 0 -> aller à gauche, 1 -> aller à droite. si c'est une feuille on le dit sinon on update juste la position du pointeur
+         if isTree then
+            ReconstructHuffmanTree (it, countInfix, encodedFile, infixTree, currentPointer, symbolsArray);
+            isTree := False; 	 
+         else
+            GetRoot (currentPointer);
+            ExploreTree (currentPointer, encodedFile, decodedFile);
+         end if;
       end loop;
-      ReconstructHuffmanTree (it, encodedFile, binaryTree, infixTree, previousPointer, symbolsArray);
    end ExploreText;
 
 
-   function ExploreTree (code : in String; root : in treeNodePointer) return treeNodePointer is
-
+   Procedure ExploreTree  (root : in  treeNodePointer; encodedFile : in out File_Type; decodedFile : in out File_Type ) is
+   
+   code : String (1 .. 1);
+   
    begin
       if root.leftChild = null then
-         return root;
+         if root.symbol /= "11111111" then
+            Put (decodedFile, root.symbol);
+         end if;
+         return;
       end if;
+      Get (encodedFile, code);
       if code = "0" then
-         return root.leftChild;
+         ExploreTree (root.leftChild, encodedFile, decodedFile);
       else
-         return root.rightChild;
+         ExploreTree (root.rightChild, encodedFile, decodedFile);
       end if;
    end ExploreTree;
 
 
-   procedure ReconstructHuffmanTree (it : in out Integer; encodedFile : in File_Type; binaryTree : in out treeNodePointer; infixTree : in out Unbounded_String; previous : in out treeNodePointer; symbolsArray : in stringArray) is
+   procedure GetRoot (root : in out treeNodePointer) is
+   begin    
+      while root.parent /= Null loop
+         root := root.parent;
+      end loop;
+   end GetRoot;
+
+
+   procedure ReconstructHuffmanTree (it : in out Integer; countInfix : in out Integer; encodedFile : in File_Type; infixTree : in out Unbounded_String; current : in out treeNodePointer; symbolsArray : in stringArray) is
 
    infixString : CONSTANT String := To_String (infixTree);
-   newNode : treeNodePointer;
    rightChild : treeNodePointer;
    leftChild : treeNodePointer;
    toCall : treeNodePointer;
-
+   
    begin
-      if symbolsArray (it) = "00000000" then
-         return;
-      end if;
-      if infixString (1) = '0' then
-         rightChild := new treeNode' ("--------", 0, null, null, newNode, False);
-         leftChild := new treeNode' ("--------", 0, null, null, newNode, False);
-         newNode := new treeNode' ("--------", 0, rightChild, leftChild, previous, False);
+      if infixString (countInfix) = '0' then
+         rightChild := new treeNode' ("--------", 0, null, null, current, False);
+         leftChild := new treeNode' ("--------", 0, null, null, current, False);
+         current.leftChild := leftChild;
+         current.rightChild := rightChild;
          toCall := leftChild;
       else
-         previous.isSeen := True;
-         previous.symbol := symbolsArray (it);
-         it := it + 1;
-         if previous.parent.isSeen then
-            while previous.isSeen loop
-               previous := previous.parent;
+         current.isSeen := True;
+         current.symbol := symbolsArray (it);
+         if current.parent.isSeen then
+            while current.isSeen loop
+               if current.parent = null then
+                  return;
+               end if;
+               current := current.parent;
             end loop;
-            previous.isSeen := True;
-            toCall := previous.rightChild;
+            current.isSeen := True;
+            toCall := current.rightChild;
          else
-            toCall := previous.parent.rightChild;
-            previous.parent.isSeen := True;
+            toCall := current.parent.rightChild;
+            current.parent.isSeen := True;
          end if;
+         it := it + 1;
       end if;
-      ReconstructHuffmanTree (it, encodedFile, binaryTree, infixTree, toCall, symbolsArray);
+      countInfix := countInfix + 1;
+      ReconstructHuffmanTree (it, countInfix, encodedFile, infixTree, toCall, symbolsArray);
    end ReconstructHuffmanTree;
 
 
-   it : Integer := 1;
-   bababa : treeNodePointer := null;
-   infixTree : Unbounded_String;
-   binaryTree : treeNodePointer;
+
    encodedFile : File_Type;
    decodedFile : File_Type;
    symbolsArray : stringArray;
@@ -120,8 +146,10 @@ procedure DecompressionProcedure is
             if To_String (extractedExtension) = extension then
                -- Procedures to decompress the file
                Create (decodedFile, Out_File, To_String (decodedName));
-               ExploreText (encodedFile, decodedFile, fileName, symbolsArray, binaryTree);
-               ReconstructHuffmanTree (it, encodedFile, binaryTree, infixTree, bababa, symbolsArray);
+               Open (encodedFile, In_File, To_String (fileName));
+               ExploreText (encodedFile, decodedFile, symbolsArray);
+               Close(encodedFile);
+               Close(decodedFile);
             else
                Put_Line ("Le fichier a decompresser doit avoir l'extension .hff");
                return;

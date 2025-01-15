@@ -30,12 +30,15 @@ package DECOMPRESSION is
 procedure DecompressionProcedure;
 
 
-procedure ExploreText (encodedFile : in out File_Type; decodedFile : in out File_Type; fileName : in Unbounded_String; symbolsArray : in out StringArray; binaryTree : in treeNodePointer);
+procedure ExploreText (encodedFile : in out File_Type; decodedFile : in out File_Type; symbolsArray : in out StringArray);
 
 
-function ExploreTree (code : in String; root : in treeNodePointer) return treeNodePointer;
+procedure ExploreTree (root : in treeNodePointer; encodedFile : in out File_Type; decodedFile : in out File_Type);
 
 
-procedure ReconstructHuffmanTree (it : in out Integer; encodedFile : in File_Type; binaryTree : in out treeNodePointer; infixTree : in out Unbounded_String; previous : in out treeNodePointer; symbolsArray : in stringArray);
+procedure GetRoot(root : in out treeNodePointer);
+
+
+procedure ReconstructHuffmanTree (it : in out Integer; countInfix : in out Integer; encodedFile : in File_Type ; infixTree : in out Unbounded_String; current : in out treeNodePointer; symbolsArray : in stringArray);
 
 end DECOMPRESSION;
