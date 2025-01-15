@@ -1,0 +1,8 @@
+gnatmake -gnatwa compresser.adb
+gnatmake -gnatwa decompresser.adb
+gnatmake -gnatwa binary_to_text.adb
+gnatmake -gnatwa text_to_binary.adb
+./text_to_binary	./testfiles/exemple.txt
+./compresser 	./testfiles/exempleBINARY.txt
+./decompresser 	./testfiles/exempleBINARY.txt.hff
+./binary_to_text 	./testfiles/exempleBINARY.txt.hff.d
