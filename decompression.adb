@@ -131,6 +131,7 @@ package body DECOMPRESSION is
    extractedExtension : Unbounded_String;
    extension : CONSTANT String := ".hff";
 
+
 procedure DecompressionProcedure is
    begin
       if Argument_Count = 0 then

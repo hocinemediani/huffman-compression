@@ -17,3 +17,6 @@ decompresser.exe
 decompresser.o
 decompression.ali
 decompression.o
+text_to_binary.ali
+text_to_binary.exe
+text_to_binary.o
